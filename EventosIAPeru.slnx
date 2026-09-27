@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="EventosIAPeru.Core/EventosIAPeru.Core.csproj" />
+  <Project Path="EventosIAPeruAPI/EventosIAPeru.API.csproj" />
+</Solution>

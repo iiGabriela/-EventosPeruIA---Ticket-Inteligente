@@ -1,0 +1,1223 @@
+[
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.CategoriasController",
+    "Method": "GetCategorias",
+    "RelativePath": "api/Categorias",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.CategoriasController",
+    "Method": "CreateCategoria",
+    "RelativePath": "api/Categorias",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "categoria",
+        "Type": "EventosIAPeru.Core.Core.Entities.Categorias",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.CategoriasController",
+    "Method": "GetCategoriaById",
+    "RelativePath": "api/Categorias/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.CategoriasController",
+    "Method": "UpdateCategoria",
+    "RelativePath": "api/Categorias/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "categoria",
+        "Type": "EventosIAPeru.Core.Core.Entities.Categorias",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.CategoriasController",
+    "Method": "DeleteCategoria",
+    "RelativePath": "api/Categorias/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.ComprasController",
+    "Method": "GetCompras",
+    "RelativePath": "api/Compras",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.ComprasController",
+    "Method": "CreateCompra",
+    "RelativePath": "api/Compras",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "compra",
+        "Type": "EventosIAPeru.Core.Core.Entities.Compras",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.ComprasController",
+    "Method": "GetCompraById",
+    "RelativePath": "api/Compras/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.ComprasController",
+    "Method": "UpdateCompra",
+    "RelativePath": "api/Compras/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "compra",
+        "Type": "EventosIAPeru.Core.Core.Entities.Compras",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.ComprasController",
+    "Method": "DeleteCompra",
+    "RelativePath": "api/Compras/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.EntradasController",
+    "Method": "GetEntradas",
+    "RelativePath": "api/Entradas",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.EntradasController",
+    "Method": "CreateEntrada",
+    "RelativePath": "api/Entradas",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "entrada",
+        "Type": "EventosIAPeru.Core.Core.Entities.Entradas",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.EntradasController",
+    "Method": "GetEntradaById",
+    "RelativePath": "api/Entradas/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.EntradasController",
+    "Method": "UpdateEntrada",
+    "RelativePath": "api/Entradas/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "entrada",
+        "Type": "EventosIAPeru.Core.Core.Entities.Entradas",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.EntradasController",
+    "Method": "DeleteEntrada",
+    "RelativePath": "api/Entradas/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.EventosController",
+    "Method": "GetEventos",
+    "RelativePath": "api/Eventos",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.EventosController",
+    "Method": "CreateEvento",
+    "RelativePath": "api/Eventos",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "evento",
+        "Type": "EventosIAPeru.Core.Core.Entities.Eventos",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.EventosController",
+    "Method": "GetEventoById",
+    "RelativePath": "api/Eventos/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.EventosController",
+    "Method": "UpdateEvento",
+    "RelativePath": "api/Eventos/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "evento",
+        "Type": "EventosIAPeru.Core.Core.Entities.Eventos",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.EventosController",
+    "Method": "DeleteEvento",
+    "RelativePath": "api/Eventos/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.HistorialVistasController",
+    "Method": "GetHistorialVistas",
+    "RelativePath": "api/HistorialVistas",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.HistorialVistasController",
+    "Method": "CreateHistorialVista",
+    "RelativePath": "api/HistorialVistas",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "entidad",
+        "Type": "EventosIAPeru.Core.Core.Entities.HistorialVistas",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.HistorialVistasController",
+    "Method": "GetHistorialVistaById",
+    "RelativePath": "api/HistorialVistas/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.HistorialVistasController",
+    "Method": "UpdateHistorialVista",
+    "RelativePath": "api/HistorialVistas/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "entidad",
+        "Type": "EventosIAPeru.Core.Core.Entities.HistorialVistas",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.HistorialVistasController",
+    "Method": "DeleteHistorialVista",
+    "RelativePath": "api/HistorialVistas/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.LogAuditoriaController",
+    "Method": "GetLogs",
+    "RelativePath": "api/LogAuditoria",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.LogAuditoriaController",
+    "Method": "CreateLog",
+    "RelativePath": "api/LogAuditoria",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "log",
+        "Type": "EventosIAPeru.Core.Core.Entities.LogAuditoria",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.LogAuditoriaController",
+    "Method": "GetLogById",
+    "RelativePath": "api/LogAuditoria/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.LogAuditoriaController",
+    "Method": "UpdateLog",
+    "RelativePath": "api/LogAuditoria/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "log",
+        "Type": "EventosIAPeru.Core.Core.Entities.LogAuditoria",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.LogAuditoriaController",
+    "Method": "DeleteLog",
+    "RelativePath": "api/LogAuditoria/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.NotificacionesController",
+    "Method": "GetNotificaciones",
+    "RelativePath": "api/Notificaciones",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.NotificacionesController",
+    "Method": "CreateNotificacion",
+    "RelativePath": "api/Notificaciones",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "entidad",
+        "Type": "EventosIAPeru.Core.Core.Entities.Notificaciones",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.NotificacionesController",
+    "Method": "GetNotificacionById",
+    "RelativePath": "api/Notificaciones/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.NotificacionesController",
+    "Method": "UpdateNotificacion",
+    "RelativePath": "api/Notificaciones/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "entidad",
+        "Type": "EventosIAPeru.Core.Core.Entities.Notificaciones",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.NotificacionesController",
+    "Method": "DeleteNotificacion",
+    "RelativePath": "api/Notificaciones/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.PreferenciasUsuarioController",
+    "Method": "GetPreferencias",
+    "RelativePath": "api/PreferenciasUsuario",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.PreferenciasUsuarioController",
+    "Method": "CreatePreferencia",
+    "RelativePath": "api/PreferenciasUsuario",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "entidad",
+        "Type": "EventosIAPeru.Core.Core.Entities.PreferenciasUsuario",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.PreferenciasUsuarioController",
+    "Method": "GetPreferenciaById",
+    "RelativePath": "api/PreferenciasUsuario/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.PreferenciasUsuarioController",
+    "Method": "UpdatePreferencia",
+    "RelativePath": "api/PreferenciasUsuario/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "entidad",
+        "Type": "EventosIAPeru.Core.Core.Entities.PreferenciasUsuario",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.PreferenciasUsuarioController",
+    "Method": "DeletePreferencia",
+    "RelativePath": "api/PreferenciasUsuario/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.ReglasModeracionIaController",
+    "Method": "GetReglas",
+    "RelativePath": "api/ReglasModeracionIa",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.ReglasModeracionIaController",
+    "Method": "CreateRegla",
+    "RelativePath": "api/ReglasModeracionIa",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "entidad",
+        "Type": "EventosIAPeru.Core.Core.Entities.ReglasModeracionIa",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.ReglasModeracionIaController",
+    "Method": "GetReglaById",
+    "RelativePath": "api/ReglasModeracionIa/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.ReglasModeracionIaController",
+    "Method": "UpdateRegla",
+    "RelativePath": "api/ReglasModeracionIa/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "entidad",
+        "Type": "EventosIAPeru.Core.Core.Entities.ReglasModeracionIa",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.ReglasModeracionIaController",
+    "Method": "DeleteRegla",
+    "RelativePath": "api/ReglasModeracionIa/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.ReportesEventosController",
+    "Method": "GetReportes",
+    "RelativePath": "api/ReportesEventos",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.ReportesEventosController",
+    "Method": "CreateReporte",
+    "RelativePath": "api/ReportesEventos",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "entidad",
+        "Type": "EventosIAPeru.Core.Core.Entities.ReportesEventos",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.ReportesEventosController",
+    "Method": "GetReporteById",
+    "RelativePath": "api/ReportesEventos/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.ReportesEventosController",
+    "Method": "UpdateReporte",
+    "RelativePath": "api/ReportesEventos/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "entidad",
+        "Type": "EventosIAPeru.Core.Core.Entities.ReportesEventos",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.ReportesEventosController",
+    "Method": "DeleteReporte",
+    "RelativePath": "api/ReportesEventos/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.ReportesUsuariosController",
+    "Method": "GetReportes",
+    "RelativePath": "api/ReportesUsuarios",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.ReportesUsuariosController",
+    "Method": "CreateReporte",
+    "RelativePath": "api/ReportesUsuarios",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "entidad",
+        "Type": "EventosIAPeru.Core.Core.Entities.ReportesUsuarios",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.ReportesUsuariosController",
+    "Method": "GetReporteById",
+    "RelativePath": "api/ReportesUsuarios/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.ReportesUsuariosController",
+    "Method": "UpdateReporte",
+    "RelativePath": "api/ReportesUsuarios/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "entidad",
+        "Type": "EventosIAPeru.Core.Core.Entities.ReportesUsuarios",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.ReportesUsuariosController",
+    "Method": "DeleteReporte",
+    "RelativePath": "api/ReportesUsuarios/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.ResenasController",
+    "Method": "GetResenas",
+    "RelativePath": "api/Resenas",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.ResenasController",
+    "Method": "CreateResena",
+    "RelativePath": "api/Resenas",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "entidad",
+        "Type": "EventosIAPeru.Core.Core.Entities.Resenas",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.ResenasController",
+    "Method": "GetResenaById",
+    "RelativePath": "api/Resenas/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.ResenasController",
+    "Method": "UpdateResena",
+    "RelativePath": "api/Resenas/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "entidad",
+        "Type": "EventosIAPeru.Core.Core.Entities.Resenas",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.ResenasController",
+    "Method": "DeleteResena",
+    "RelativePath": "api/Resenas/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.RolesController",
+    "Method": "GetRoles",
+    "RelativePath": "api/Roles",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.RolesController",
+    "Method": "CreateRol",
+    "RelativePath": "api/Roles",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "entidad",
+        "Type": "EventosIAPeru.Core.Core.Entities.Roles",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.RolesController",
+    "Method": "GetRolById",
+    "RelativePath": "api/Roles/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.RolesController",
+    "Method": "UpdateRol",
+    "RelativePath": "api/Roles/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "entidad",
+        "Type": "EventosIAPeru.Core.Core.Entities.Roles",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.RolesController",
+    "Method": "DeleteRol",
+    "RelativePath": "api/Roles/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.UsuarioRolesController",
+    "Method": "GetUsuarioRoles",
+    "RelativePath": "api/UsuarioRoles",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.UsuarioRolesController",
+    "Method": "CreateUsuarioRol",
+    "RelativePath": "api/UsuarioRoles",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "entidad",
+        "Type": "EventosIAPeru.Core.Core.Entities.UsuarioRoles",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.UsuarioRolesController",
+    "Method": "GetUsuarioRol",
+    "RelativePath": "api/UsuarioRoles/{usuarioId}/{rolId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "usuarioId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "rolId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.UsuarioRolesController",
+    "Method": "UpdateUsuarioRol",
+    "RelativePath": "api/UsuarioRoles/{usuarioId}/{rolId}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "usuarioId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "rolId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "entidad",
+        "Type": "EventosIAPeru.Core.Core.Entities.UsuarioRoles",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.UsuarioRolesController",
+    "Method": "DeleteUsuarioRol",
+    "RelativePath": "api/UsuarioRoles/{usuarioId}/{rolId}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "usuarioId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "rolId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.UsuariosController",
+    "Method": "GetUsuarios",
+    "RelativePath": "api/Usuarios",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.UsuariosController",
+    "Method": "CreateUsuario",
+    "RelativePath": "api/Usuarios",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "entidad",
+        "Type": "EventosIAPeru.Core.Core.Entities.Usuarios",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.UsuariosController",
+    "Method": "GetUsuarioById",
+    "RelativePath": "api/Usuarios/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.UsuariosController",
+    "Method": "UpdateUsuario",
+    "RelativePath": "api/Usuarios/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "entidad",
+        "Type": "EventosIAPeru.Core.Core.Entities.Usuarios",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.UsuariosController",
+    "Method": "DeleteUsuario",
+    "RelativePath": "api/Usuarios/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "EventosIAPeruAPI.Controllers.WeatherForecastController",
+    "Method": "Get",
+    "RelativePath": "WeatherForecast",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[EventosIAPeruAPI.WeatherForecast, EventosIAPeru.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ],
+    "EndpointName": "GetWeatherForecast"
+  }
+]
