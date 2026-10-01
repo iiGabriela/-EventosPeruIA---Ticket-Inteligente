@@ -1,0 +1,153 @@
+@host = https://localhost:7224
+@admin = uid-prueba-gabriela
+@eventoId = 1
+@reporteId = 1
+@usuarioId = 2
+
+### 1) US-15 Panel con indicadores (200 si ya eres ADMINISTRADOR)
+GET {{host}}/api/moderacion/panel
+X-Firebase-Uid: {{admin}}
+
+### 2) US-15 Un usuario normal intenta entrar al panel (403)
+GET {{host}}/api/moderacion/panel
+X-Firebase-Uid: uid-usuario2
+
+### 3) US-15 Un usuario reporta un evento (201)
+POST {{host}}/api/moderacion/eventos/{{eventoId}}/reportar
+Content-Type: application/json
+X-Firebase-Uid: uid-usuario2
+
+{
+  "motivo": "El aforo parece mayor al permitido en la sede."
+}
+
+### 4) US-15 Reportes pendientes (copia el reporteId de aqui)
+GET {{host}}/api/moderacion/reportes?estado=PENDIENTE
+X-Firebase-Uid: {{admin}}
+
+### 5) US-15 Lista de eventos para moderar
+GET {{host}}/api/moderacion/eventos
+X-Firebase-Uid: {{admin}}
+
+### 6) US-15 Detalle del evento (validaciones, aforo y reportes activos)
+GET {{host}}/api/moderacion/eventos/{{eventoId}}
+X-Firebase-Uid: {{admin}}
+
+### 7) US-15 Moderar SIN confirmar (400)
+PUT {{host}}/api/moderacion/eventos/{{eventoId}}/moderar
+Content-Type: application/json
+X-Firebase-Uid: {{admin}}
+
+{
+  "estadoModeracion": "DESACTIVADO",
+  "motivo": "Falta de licencia municipal",
+  "confirmado": false
+}
+
+### 8) US-15 Desactivar el evento confirmando (204)
+PUT {{host}}/api/moderacion/eventos/{{eventoId}}/moderar
+Content-Type: application/json
+X-Firebase-Uid: {{admin}}
+
+{
+  "estadoModeracion": "DESACTIVADO",
+  "motivo": "Falta de licencia municipal",
+  "confirmado": true
+}
+
+### 9) US-15 Volver a aprobarlo (204)
+PUT {{host}}/api/moderacion/eventos/{{eventoId}}/moderar
+Content-Type: application/json
+X-Firebase-Uid: {{admin}}
+
+{
+  "estadoModeracion": "CONFORME",
+  "confirmado": true
+}
+
+### 10) US-15 Resolver el reporte (204)
+PUT {{host}}/api/moderacion/reportes/{{reporteId}}/resolver
+Content-Type: application/json
+X-Firebase-Uid: {{admin}}
+
+{
+  "estado": "RESUELTO",
+  "resolucion": "Se reviso la documentacion del evento y es correcta.",
+  "confirmado": true
+}
+
+### 11) US-15 Buscar usuarios por nombre o correo
+GET {{host}}/api/moderacion/usuarios?texto=usuario
+X-Firebase-Uid: {{admin}}
+
+### 12) US-15 Bloquear una cuenta (204). Cambia @usuarioId por el id del usuario 2
+PUT {{host}}/api/moderacion/usuarios/{{usuarioId}}/estado
+Content-Type: application/json
+X-Firebase-Uid: {{admin}}
+
+{
+  "estado": "BLOQUEADO",
+  "motivo": "Publicaciones fraudulentas reportadas",
+  "confirmado": true
+}
+
+### 13) US-02 + US-15 El usuario bloqueado ya no puede usar su cuenta (403)
+GET {{host}}/api/usuario/me
+X-Firebase-Uid: uid-usuario2
+
+### 14) US-15 Reactivar la cuenta (204)
+PUT {{host}}/api/moderacion/usuarios/{{usuarioId}}/estado
+Content-Type: application/json
+X-Firebase-Uid: {{admin}}
+
+{
+  "estado": "ACTIVO",
+  "confirmado": true
+}
+
+### 15) US-15 Verificar una cuenta (204)
+PUT {{host}}/api/moderacion/usuarios/{{usuarioId}}/verificar
+X-Firebase-Uid: {{admin}}
+
+### 16) US-15 Log de auditoria
+GET {{host}}/api/moderacion/auditoria
+X-Firebase-Uid: {{admin}}
+
+### 17) US-15 Exportar el log de auditoria (descarga auditoria.csv)
+GET {{host}}/api/moderacion/auditoria/exportar
+X-Firebase-Uid: {{admin}}
+
+### 18) US-15 Crear regla simple: aforo mayor a 5000 pasa a revision (201)
+POST {{host}}/api/moderacion/reglas
+Content-Type: application/json
+X-Firebase-Uid: {{admin}}
+
+{
+  "nombre": "Aforo muy alto",
+  "tipo": "SIMPLE",
+  "criterio": "Eventos con aforo mayor a 5000 requieren revision",
+  "accion": "EN_REVISION",
+  "campo": "AFORO_TOTAL",
+  "operador": "MAYOR",
+  "valor": 5000
+}
+
+### 19) US-15 Crear regla de IA (solo criterio en texto) (201)
+POST {{host}}/api/moderacion/reglas
+Content-Type: application/json
+X-Firebase-Uid: {{admin}}
+
+{
+  "nombre": "Contenido enganoso",
+  "tipo": "IA",
+  "criterio": "Detectar descripciones que prometen precios o beneficios irreales",
+  "accion": "EN_REVISION"
+}
+
+### 20) US-15 Ver reglas
+GET {{host}}/api/moderacion/reglas
+X-Firebase-Uid: {{admin}}
+
+### 21) US-15 Desactivar una regla (204). Cambia el 1 por el id de la regla
+PUT {{host}}/api/moderacion/reglas/1/activa?activa=false
+X-Firebase-Uid: {{admin}}
