@@ -104,5 +104,31 @@ namespace EventosIAPeru.Core.Infrastructure.Repositories
                             .Usuario
                             .AnyAsync(u => u.UsuarioId == usuarioId && u.Rol.Any(r => r.Nombre == nombreRol));
         }
+
+        public async Task<List<CategoriaEvento>> GetIntereses(int usuarioId)
+        {
+            return await _dbContext.Usuario
+                                   .AsNoTracking()
+                                   .Where(u => u.UsuarioId == usuarioId)
+                                   .SelectMany(u => u.Categoria)
+                                   .OrderBy(c => c.Nombre)
+                                   .ToListAsync();
+        }
+
+        public async Task<bool> ActualizarIntereses(int usuarioId, IReadOnlyCollection<CategoriaEvento> categorias)
+        {
+            var usuario = await _dbContext.Usuario
+                                           .Include(u => u.Categoria)
+                                           .FirstOrDefaultAsync(u => u.UsuarioId == usuarioId);
+            if (usuario == null)
+                return false;
+
+            usuario.Categoria.Clear();
+            foreach (var categoria in categorias)
+                usuario.Categoria.Add(categoria);
+
+            await _dbContext.SaveChangesAsync();
+            return true;
+        }
     }
 }

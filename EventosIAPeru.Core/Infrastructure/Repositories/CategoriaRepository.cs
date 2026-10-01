@@ -34,6 +34,19 @@ namespace EventosIAPeru.Core.Infrastructure.Repositories
             return categoria;
         }
 
+        public async Task<List<CategoriaEvento>> GetCategoriasByIds(IEnumerable<int> ids)
+        {
+            var categoriaIds = ids.Distinct().ToList();
+            if (categoriaIds.Count == 0)
+                return new List<CategoriaEvento>();
+
+            return await _dbContext.CategoriaEvento
+                                .AsNoTracking()
+                                .Where(c => categoriaIds.Contains(c.CategoriaId))
+                                .OrderBy(c => c.Nombre)
+                                .ToListAsync();
+        }
+
         /// <summary>Categorías más consultadas (chips de acceso rápido, US-05).</summary>
         public async Task<IEnumerable<CategoriaEvento>> GetCategoriasPopulares(int cantidad)
         {

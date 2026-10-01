@@ -48,6 +48,8 @@ builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
 builder.Services.AddScoped<ICategoriaService, CategoriaService>();
 builder.Services.AddScoped<IEventoRepository, EventoRepository>();
 builder.Services.AddScoped<IEventoService, EventoService>();
+builder.Services.AddScoped<IRecomendacionRepository, RecomendacionRepository>();
+builder.Services.AddScoped<IRecomendacionService, RecomendacionService>();
 
 // Notificaciones internas (US-14)
 builder.Services.AddScoped<INotificacionRepository, NotificacionRepository>();

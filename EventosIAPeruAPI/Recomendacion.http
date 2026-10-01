@@ -1,0 +1,19 @@
+@host = https://localhost:7000
+@firebaseUid = reemplazar-con-firebase-uid
+
+### US-10: categorías de interés actuales
+GET {{host}}/api/Usuario/me/intereses
+X-Firebase-Uid: {{firebaseUid}}
+
+### US-10: guardar categorías de interés
+PUT {{host}}/api/Usuario/me/intereses
+Content-Type: application/json
+X-Firebase-Uid: {{firebaseUid}}
+
+{
+  "categoriaIds": [1, 3]
+}
+
+### US-10: recomendaciones personalizadas
+GET {{host}}/api/Evento/recomendados?cantidad=6
+X-Firebase-Uid: {{firebaseUid}}
