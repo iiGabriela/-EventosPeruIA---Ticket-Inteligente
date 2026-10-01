@@ -52,6 +52,13 @@ builder.Services.AddScoped<IEventoService, EventoService>();
 builder.Services.AddScoped<IVentaRepository, VentaRepository>();
 builder.Services.AddScoped<IVentaService, VentaService>();
 
+// Compras, entradas y check-in (US-06..09, AnaLu)
+builder.Services.AddScoped<ICompraRepository, CompraRepository>();
+builder.Services.AddScoped<ICompraService, CompraService>();
+builder.Services.AddScoped<IEntradaRepository, EntradaRepository>();
+builder.Services.AddScoped<IEntradaService, EntradaService>();
+builder.Services.AddScoped<IQrService, QrService>();
+
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
