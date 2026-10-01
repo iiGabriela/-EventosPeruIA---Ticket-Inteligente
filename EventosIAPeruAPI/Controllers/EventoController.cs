@@ -1,21 +1,19 @@
 using Microsoft.AspNetCore.Mvc;
 using EventosIAPeru.Core.Core.DTOs;
 using EventosIAPeru.Core.Core.Interfaces;
-using EventosIAPeru.Core.Shared;
 
 namespace EventosIAPeru.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class EventoController : ControllerBase
+    public class EventoController : BaseApiController
     {
         private readonly IEventoService _eventoService;
-        private readonly IWebHostEnvironment _environment;
 
         public EventoController(IEventoService eventoService, IWebHostEnvironment environment)
+            : base(environment)
         {
             _eventoService = eventoService;
-            _environment = environment;
         }
 
         // ---------------------------- US-05 ----------------------------
@@ -100,38 +98,6 @@ namespace EventosIAPeru.API.Controllers
 
             var result = await _eventoService.CancelarEvento(firebaseUid, id);
             return Responder(result);
-        }
-
-        // ---------------------------- Ayudantes ----------------------------
-
-        private IActionResult Responder(ResultadoOperacion result)
-        {
-            switch (result.Tipo)
-            {
-                case TipoResultado.NoEncontrado:
-                    return NotFound(new { mensaje = result.Mensaje });
-                case TipoResultado.NoAutorizado:
-                    return StatusCode(StatusCodes.Status403Forbidden, new { mensaje = result.Mensaje });
-                case TipoResultado.Invalido:
-                    return BadRequest(new { mensaje = result.Mensaje });
-                default:
-                    return NoContent();
-            }
-        }
-
-        /// <summary>
-        /// UID del usuario autenticado (token de Firebase).
-        /// Solo en Development, mientras se configura Firebase (US-02), se acepta el header
-        /// "X-Firebase-Uid" para poder probar la API.
-        /// </summary>
-        private string? ObtenerFirebaseUid()
-        {
-            var firebaseUid = User.ObtenerFirebaseUid();
-            if (string.IsNullOrWhiteSpace(firebaseUid) && _environment.IsDevelopment())
-            {
-                firebaseUid = Request.Headers["X-Firebase-Uid"].FirstOrDefault();
-            }
-            return string.IsNullOrWhiteSpace(firebaseUid) ? null : firebaseUid;
         }
     }
 }

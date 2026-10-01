@@ -8,6 +8,8 @@ namespace EventosIAPeru.Core.Core.Services
     /// <summary>US-04 (publicación y edición) y US-05 (búsqueda y filtrado).</summary>
     public class EventoService : IEventoService
     {
+        private const string RolOrganizador = "ORGANIZADOR";
+
         private readonly IEventoRepository _eventoRepository;
         private readonly ICategoriaRepository _categoriaRepository;
         private readonly IUsuarioRepository _usuarioRepository;
@@ -73,6 +75,11 @@ namespace EventosIAPeru.Core.Core.Services
             var usuario = await _usuarioRepository.GetUsuarioByFirebaseUid(firebaseUid);
             if (usuario == null) return ResultadoOperacion.NoAutorizado("Tu usuario no está registrado.");
             if (usuario.Estado != "ACTIVO") return ResultadoOperacion.NoAutorizado("Tu cuenta no está activa.");
+
+            // US-03: para publicar eventos la cuenta debe tener el rol ORGANIZADOR
+            var esOrganizador = await _usuarioRepository.TieneRol(usuario.UsuarioId, RolOrganizador);
+            if (!esOrganizador)
+                return ResultadoOperacion.NoAutorizado("Activa tu rol de organizador para crear eventos.");
 
             var categoria = await _categoriaRepository.GetCategoriaById(eventoDTO.CategoriaId);
             if (categoria == null) return ResultadoOperacion.Invalido("La categoría seleccionada no existe.");

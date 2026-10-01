@@ -7,15 +7,14 @@ namespace EventosIAPeru.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class VentaController : ControllerBase
+    public class VentaController : BaseApiController
     {
         private readonly IVentaService _ventaService;
-        private readonly IWebHostEnvironment _environment;
 
         public VentaController(IVentaService ventaService, IWebHostEnvironment environment)
+            : base(environment)
         {
             _ventaService = ventaService;
-            _environment = environment;
         }
 
         /// <summary>US-11: panel de ventas del organizador (solo sus eventos).</summary>
@@ -72,19 +71,5 @@ namespace EventosIAPeru.API.Controllers
             return !(filtro.FechaDesde.HasValue && filtro.FechaHasta.HasValue && filtro.FechaDesde > filtro.FechaHasta);
         }
 
-        /// <summary>
-        /// UID del usuario autenticado (token de Firebase).
-        /// Solo en Development, mientras se configura Firebase (US-02), se acepta el header
-        /// "X-Firebase-Uid" para poder probar la API.
-        /// </summary>
-        private string? ObtenerFirebaseUid()
-        {
-            var firebaseUid = User.ObtenerFirebaseUid();
-            if (string.IsNullOrWhiteSpace(firebaseUid) && _environment.IsDevelopment())
-            {
-                firebaseUid = Request.Headers["X-Firebase-Uid"].FirstOrDefault();
-            }
-            return string.IsNullOrWhiteSpace(firebaseUid) ? null : firebaseUid;
-        }
     }
 }

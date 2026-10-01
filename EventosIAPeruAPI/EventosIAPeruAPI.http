@@ -3,6 +3,21 @@
 # Solo funciona en Development, hasta que se configure Firebase (US-02).
 @uid = uid-prueba-hugo
 
+### ===================== Antes de probar (endpoints de Gabriela) =====================
+# 1) Registrarse (crea el usuario como ASISTENTE)
+POST {{host}}/api/Usuario/registro
+Content-Type: application/json
+X-Firebase-Uid: {{uid}}
+
+{
+  "nombre": "Hugo Flores",
+  "email": "hugo@test.com"
+}
+
+### 2) Activar el rol ORGANIZADOR (necesario para crear eventos)
+POST {{host}}/api/Usuario/me/rol-organizador
+X-Firebase-Uid: {{uid}}
+
 ### ===================== US-05: Categorías =====================
 GET {{host}}/api/Categoria
 Accept: application/json
