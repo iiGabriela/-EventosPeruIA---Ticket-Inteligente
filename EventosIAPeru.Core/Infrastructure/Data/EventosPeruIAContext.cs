@@ -369,6 +369,10 @@ public partial class EventosPeruIAContext : DbContext
             entity.Property(e => e.Mensaje)
                 .HasMaxLength(1000)
                 .HasColumnName("mensaje");
+            entity.Property(e => e.Prioridad)
+                .HasMaxLength(20)
+                .HasDefaultValueSql("'INFORMATIVO'::character varying")
+                .HasColumnName("prioridad");
             entity.Property(e => e.Titulo)
                 .HasMaxLength(120)
                 .HasColumnName("titulo");

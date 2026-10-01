@@ -6,6 +6,7 @@ using EventosIAPeru.Core.Core.Interfaces;
 using EventosIAPeru.Core.Core.Services;
 using EventosIAPeru.Core.Infrastructure.Data;
 using EventosIAPeru.Core.Infrastructure.Repositories;
+using EventosIAPeru.API.Background;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,6 +48,11 @@ builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
 builder.Services.AddScoped<ICategoriaService, CategoriaService>();
 builder.Services.AddScoped<IEventoRepository, EventoRepository>();
 builder.Services.AddScoped<IEventoService, EventoService>();
+
+// Notificaciones internas (US-14)
+builder.Services.AddScoped<INotificacionRepository, NotificacionRepository>();
+builder.Services.AddScoped<INotificacionService, NotificacionService>();
+builder.Services.AddHostedService<NotificacionRecordatorioWorker>();
 
 // Ventas y reportes (US-11, US-12)
 builder.Services.AddScoped<IVentaRepository, VentaRepository>();

@@ -15,6 +15,8 @@ public partial class Notificacion
 
     public string Mensaje { get; set; } = null!;
 
+    public string Prioridad { get; set; } = "INFORMATIVO";
+
     public bool Leida { get; set; }
 
     public DateTime FechaCreacion { get; set; }
