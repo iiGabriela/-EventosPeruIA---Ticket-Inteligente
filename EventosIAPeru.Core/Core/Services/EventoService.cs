@@ -13,14 +13,17 @@ namespace EventosIAPeru.Core.Core.Services
         private readonly IEventoRepository _eventoRepository;
         private readonly ICategoriaRepository _categoriaRepository;
         private readonly IUsuarioRepository _usuarioRepository;
+        private readonly INotificacionService _notificacionService;
 
         public EventoService(IEventoRepository eventoRepository,
                              ICategoriaRepository categoriaRepository,
-                             IUsuarioRepository usuarioRepository)
+                             IUsuarioRepository usuarioRepository,
+                             INotificacionService notificacionService)
         {
             _eventoRepository = eventoRepository;
             _categoriaRepository = categoriaRepository;
             _usuarioRepository = usuarioRepository;
+            _notificacionService = notificacionService;
         }
 
         // ---------------------------- US-05 ----------------------------
@@ -139,6 +142,8 @@ namespace EventosIAPeru.Core.Core.Services
             var actualizado = await _eventoRepository.UpdateEvento(eventoActualizado);
             if (!actualizado) return ResultadoOperacion.Invalido("No se pudo actualizar el evento.");
 
+            await _notificacionService.NotificarCambioEvento(evento, eventoActualizado);
+
             return ResultadoOperacion.Ok(evento.EventoId);
         }
 
@@ -172,6 +177,8 @@ namespace EventosIAPeru.Core.Core.Services
 
             var actualizado = await _eventoRepository.UpdateEstado(id, "CANCELADO");
             if (!actualizado) return ResultadoOperacion.Invalido("No se pudo cancelar el evento.");
+
+            await _notificacionService.NotificarCancelacionEvento(evento);
 
             return ResultadoOperacion.Ok(id);
         }
