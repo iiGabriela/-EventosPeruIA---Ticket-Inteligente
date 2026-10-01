@@ -9,11 +9,15 @@ namespace EventosIAPeru.API.Controllers
     public class EventoController : BaseApiController
     {
         private readonly IEventoService _eventoService;
+        private readonly IRecomendacionService _recomendacionService;
 
-        public EventoController(IEventoService eventoService, IWebHostEnvironment environment)
+        public EventoController(IEventoService eventoService,
+                                IRecomendacionService recomendacionService,
+                                IWebHostEnvironment environment)
             : base(environment)
         {
             _eventoService = eventoService;
+            _recomendacionService = recomendacionService;
         }
 
         // ---------------------------- US-05 ----------------------------
@@ -29,6 +33,21 @@ namespace EventosIAPeru.API.Controllers
             var mensaje = total == 0 ? "No se encontraron eventos con los filtros seleccionados." : null;
 
             return Ok(new { total, mensaje, eventos });
+        }
+
+        /// <summary>US-10: recomendaciones personalizadas para el asistente autenticado.</summary>
+        [HttpGet("recomendados")]
+        public async Task<IActionResult> GetRecomendados([FromQuery] int cantidad = 6)
+        {
+            var firebaseUid = ObtenerFirebaseUid();
+            if (firebaseUid == null)
+                return Unauthorized(new { mensaje = "Debe iniciar sesión para recibir recomendaciones personalizadas." });
+
+            var (result, recomendaciones) = await _recomendacionService.ObtenerRecomendaciones(firebaseUid, cantidad);
+            if (!result.Exito)
+                return Responder(result);
+
+            return Ok(recomendaciones);
         }
 
         [HttpGet("{id:int}")]

@@ -17,5 +17,8 @@ namespace EventosIAPeru.Core.Core.Interfaces
 
         // US-03: valida que el usuario tenga el rol y devuelve el mensaje para el toast
         Task<(ResultadoOperacion Resultado, CambioRolDTO? Cambio)> CambiarRolActivo(string firebaseUid, string rol);
+
+        Task<(ResultadoOperacion Resultado, List<CategoriaDTO>? Intereses)> ObtenerIntereses(string firebaseUid);
+        Task<ResultadoOperacion> ActualizarIntereses(string firebaseUid, ActualizarInteresesDTO dto);
     }
 }

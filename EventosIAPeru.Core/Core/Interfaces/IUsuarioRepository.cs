@@ -25,5 +25,8 @@ namespace EventosIAPeru.Core.Core.Interfaces
 
         // ¿El usuario tiene ese rol? (sirve para validar permisos)
         Task<bool> TieneRol(int usuarioId, string nombreRol);
+
+        Task<List<CategoriaEvento>> GetIntereses(int usuarioId);
+        Task<bool> ActualizarIntereses(int usuarioId, IReadOnlyCollection<CategoriaEvento> categorias);
     }
 }
