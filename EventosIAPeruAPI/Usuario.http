@@ -1,0 +1,51 @@
+@host = https://localhost:7224
+@uid = uid-prueba-gabriela
+
+### 1) US-01 Registro (crea el usuario como ASISTENTE)
+POST {{host}}/api/usuario/registro
+Content-Type: application/json
+X-Firebase-Uid: {{uid}}
+
+{
+  "nombre": "Gabriela Marin",
+  "email": "gabriela@test.com"
+}
+
+### 2) US-01 Probar correo repetido (debe dar 400 con otro uid)
+POST {{host}}/api/usuario/registro
+Content-Type: application/json
+X-Firebase-Uid: uid-otro
+
+{
+  "nombre": "Otra Persona",
+  "email": "gabriela@test.com"
+}
+
+### 3) US-02 Ver mi perfil (200 si estoy registrada y activa)
+GET {{host}}/api/usuario/me
+X-Firebase-Uid: {{uid}}
+
+### 4) US-02 Sin sesión (debe dar 401)
+GET {{host}}/api/usuario/me
+
+### 5) US-03 Activar rol ORGANIZADOR en la misma cuenta
+POST {{host}}/api/usuario/me/rol-organizador
+X-Firebase-Uid: {{uid}}
+
+### 6) US-03 Cambiar de rol activo (devuelve el mensaje del toast)
+POST {{host}}/api/usuario/me/cambiar-rol
+Content-Type: application/json
+X-Firebase-Uid: {{uid}}
+
+{
+  "rol": "ORGANIZADOR"
+}
+
+### 7) US-03 Pedir ser ADMINISTRADOR sin tenerlo (debe dar 403)
+POST {{host}}/api/usuario/me/cambiar-rol
+Content-Type: application/json
+X-Firebase-Uid: {{uid}}
+
+{
+  "rol": "ADMINISTRADOR"
+}

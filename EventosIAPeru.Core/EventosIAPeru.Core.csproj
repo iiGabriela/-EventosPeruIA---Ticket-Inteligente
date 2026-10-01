@@ -8,15 +8,19 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.12" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.12" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.12">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
+    <PackageReference Include="Pgvector.EntityFrameworkCore" Version="0.3.0" />
+    <!-- US-12: exportación de reportes -->
+    <PackageReference Include="ClosedXML" Version="0.104.2" />
+    <PackageReference Include="QuestPDF" Version="2024.12.3" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Core\Interfaces\" />
-    <Folder Include="Core\DTOs\" />
-    <Folder Include="Core\Services\" />
-    <Folder Include="Infrastructure\Repositories\" />
-    <Folder Include="Infrastructure\Services\" />
+    <Folder Include="Core\Settings\" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,68 @@
+@host = https://localhost:7224
+@uid = uid-prueba-gabriela
+@eventoId = 1
+
+### 0) Registrar un segundo usuario (sin entradas) para probar el 403
+POST {{host}}/api/usuario/registro
+Content-Type: application/json
+X-Firebase-Uid: uid-usuario2
+
+{
+  "nombre": "Usuario Dos",
+  "email": "usuario2@test.com"
+}
+
+### 1) US-13 Eventos pendientes de reseñar (debe aparecer el evento de prueba)
+GET {{host}}/api/resena/pendientes
+X-Firebase-Uid: {{uid}}
+
+### 2) US-13 Crear reseña (201)
+POST {{host}}/api/resena
+Content-Type: application/json
+X-Firebase-Uid: {{uid}}
+
+{
+  "eventoId": {{eventoId}},
+  "calificacion": 5,
+  "comentario": "Muy buen evento, bien organizado."
+}
+
+### 3) US-13 Reseñar otra vez el mismo evento (400: ya reseñaste)
+POST {{host}}/api/resena
+Content-Type: application/json
+X-Firebase-Uid: {{uid}}
+
+{
+  "eventoId": {{eventoId}},
+  "calificacion": 4
+}
+
+### 4) US-13 Calificación fuera de rango (400)
+POST {{host}}/api/resena
+Content-Type: application/json
+X-Firebase-Uid: {{uid}}
+
+{
+  "eventoId": {{eventoId}},
+  "calificacion": 9
+}
+
+### 5) US-13 Usuario sin entrada intenta reseñar (403)
+POST {{host}}/api/resena
+Content-Type: application/json
+X-Firebase-Uid: uid-usuario2
+
+{
+  "eventoId": {{eventoId}},
+  "calificacion": 3
+}
+
+### 6) US-13 Promedio y reseñas del evento (público, sin sesión)
+GET {{host}}/api/resena/evento/{{eventoId}}
+
+### 7) US-13 Mi historial de reseñas
+GET {{host}}/api/resena/mias
+X-Firebase-Uid: {{uid}}
+
+### 8) US-13 Sin sesión (401)
+GET {{host}}/api/resena/pendientes

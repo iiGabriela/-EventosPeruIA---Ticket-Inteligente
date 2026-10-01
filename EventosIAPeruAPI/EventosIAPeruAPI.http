@@ -1,6 +1,88 @@
-@EventosIAPeruAPI_HostAddress = http://localhost:5295
+@host = http://localhost:5295
+# UID de Firebase de un usuario que exista en la tabla "usuario".
+# Solo funciona en Development, hasta que se configure Firebase (US-02).
+@uid = uid-prueba-hugo
 
-GET {{EventosIAPeruAPI_HostAddress}}/weatherforecast/
+### ===================== US-05: Categorías =====================
+GET {{host}}/api/Categoria
 Accept: application/json
 
 ###
+GET {{host}}/api/Categoria/populares?cantidad=4
+Accept: application/json
+
+### ===================== US-05: Búsqueda de eventos =====================
+GET {{host}}/api/Evento?texto=rock&categoriaId=2&ubicacion=Miraflores&fechaDesde=2026-10-01&fechaHasta=2026-12-31&pagina=1&tamanoPagina=12
+Accept: application/json
+
+###
+GET {{host}}/api/Evento/1
+Accept: application/json
+
+### ===================== US-04: Mis eventos =====================
+GET {{host}}/api/Evento/mis-eventos
+X-Firebase-Uid: {{uid}}
+
+### Crear evento (queda en BORRADOR)
+POST {{host}}/api/Evento
+Content-Type: application/json
+X-Firebase-Uid: {{uid}}
+
+{
+  "categoriaId": 1,
+  "nombre": "Conferencia de IA aplicada",
+  "descripcion": "Charlas sobre LLMs, embeddings y RAG.",
+  "imagenUrl": null,
+  "fechaInicio": "2026-11-20T19:00:00",
+  "fechaFin": "2026-11-20T22:00:00",
+  "sede": "Centro de Convenciones",
+  "direccion": "Av. Javier Prado 123",
+  "departamento": "Lima",
+  "provincia": "Lima",
+  "distrito": "San Isidro",
+  "aforoTotal": 200,
+  "precio": 50.00
+}
+
+### Editar evento
+PUT {{host}}/api/Evento/1
+Content-Type: application/json
+X-Firebase-Uid: {{uid}}
+
+{
+  "eventoId": 1,
+  "categoriaId": 1,
+  "nombre": "Conferencia de IA aplicada 2026",
+  "descripcion": "Charlas sobre LLMs, embeddings y RAG.",
+  "imagenUrl": null,
+  "fechaInicio": "2026-11-20T19:30:00",
+  "fechaFin": "2026-11-20T22:30:00",
+  "sede": "Centro de Convenciones",
+  "direccion": "Av. Javier Prado 123",
+  "departamento": "Lima",
+  "provincia": "Lima",
+  "distrito": "San Isidro",
+  "aforoTotal": 250,
+  "precio": 60.00
+}
+
+### Publicar evento
+PUT {{host}}/api/Evento/1/publicar
+X-Firebase-Uid: {{uid}}
+
+### Cancelar evento
+PUT {{host}}/api/Evento/1/cancelar
+X-Firebase-Uid: {{uid}}
+
+### ===================== US-11: Panel de ventas =====================
+# periodo: TODO | MES | SEMANA  (o fechaDesde / fechaHasta)
+GET {{host}}/api/Venta/panel?periodo=TODO
+X-Firebase-Uid: {{uid}}
+
+### ===================== US-12: Exportar =====================
+GET {{host}}/api/Venta/exportar/excel?periodo=MES
+X-Firebase-Uid: {{uid}}
+
+###
+GET {{host}}/api/Venta/exportar/pdf?fechaDesde=2026-10-01&fechaHasta=2026-10-31
+X-Firebase-Uid: {{uid}}
