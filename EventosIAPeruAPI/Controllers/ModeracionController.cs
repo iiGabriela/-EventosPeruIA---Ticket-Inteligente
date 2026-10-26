@@ -29,10 +29,10 @@ namespace EventosIAPeru.API.Controllers
         [HttpGet("panel")]
         public async Task<IActionResult> GetPanel()
         {
-            var firebaseUid = ObtenerFirebaseUid();
-            if (firebaseUid == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
+            var emailUsuario = ObtenerEmailUsuario();
+            if (emailUsuario == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
 
-            var (result, panel) = await _moderacionService.GetPanel(firebaseUid);
+            var (result, panel) = await _moderacionService.GetPanel(emailUsuario);
             if (!result.Exito) return Responder(result);
 
             // Mostramos el cifrado real de esta conexión (por ejemplo TLS 1.3)
@@ -46,10 +46,10 @@ namespace EventosIAPeru.API.Controllers
         [HttpGet("eventos")]
         public async Task<IActionResult> BuscarEventos([FromQuery] string? estadoModeracion, [FromQuery] string? texto, [FromQuery] int pagina = 1)
         {
-            var firebaseUid = ObtenerFirebaseUid();
-            if (firebaseUid == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
+            var emailUsuario = ObtenerEmailUsuario();
+            if (emailUsuario == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
 
-            var (result, lista) = await _moderacionService.BuscarEventos(firebaseUid, estadoModeracion, texto, pagina);
+            var (result, lista) = await _moderacionService.BuscarEventos(emailUsuario, estadoModeracion, texto, pagina);
             if (!result.Exito) return Responder(result);
             return Ok(lista);
         }
@@ -58,10 +58,10 @@ namespace EventosIAPeru.API.Controllers
         [HttpGet("eventos/{id:int}")]
         public async Task<IActionResult> GetDetalleEvento(int id)
         {
-            var firebaseUid = ObtenerFirebaseUid();
-            if (firebaseUid == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
+            var emailUsuario = ObtenerEmailUsuario();
+            if (emailUsuario == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
 
-            var (result, detalle) = await _moderacionService.GetDetalleEvento(firebaseUid, id);
+            var (result, detalle) = await _moderacionService.GetDetalleEvento(emailUsuario, id);
             if (!result.Exito) return Responder(result);
             return Ok(detalle);
         }
@@ -70,10 +70,10 @@ namespace EventosIAPeru.API.Controllers
         [HttpPut("eventos/{id:int}/moderar")]
         public async Task<IActionResult> ModerarEvento(int id, [FromBody] ModerarEventoDTO dto)
         {
-            var firebaseUid = ObtenerFirebaseUid();
-            if (firebaseUid == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
+            var emailUsuario = ObtenerEmailUsuario();
+            if (emailUsuario == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
 
-            var result = await _moderacionService.ModerarEvento(firebaseUid, id, dto);
+            var result = await _moderacionService.ModerarEvento(emailUsuario, id, dto);
             return Responder(result);
         }
 
@@ -83,10 +83,10 @@ namespace EventosIAPeru.API.Controllers
         [HttpPost("eventos/{id:int}/reportar")]
         public async Task<IActionResult> ReportarEvento(int id, [FromBody] CrearReporteDTO dto)
         {
-            var firebaseUid = ObtenerFirebaseUid();
-            if (firebaseUid == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
+            var emailUsuario = ObtenerEmailUsuario();
+            if (emailUsuario == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
 
-            var result = await _moderacionService.ReportarEvento(firebaseUid, id, dto);
+            var result = await _moderacionService.ReportarEvento(emailUsuario, id, dto);
             if (!result.Exito) return Responder(result);
 
             return StatusCode(StatusCodes.Status201Created, new { mensaje = "Reporte enviado. Un administrador lo revisará.", reporteId = result.Id });
@@ -96,10 +96,10 @@ namespace EventosIAPeru.API.Controllers
         [HttpGet("reportes")]
         public async Task<IActionResult> GetReportes([FromQuery] string? estado)
         {
-            var firebaseUid = ObtenerFirebaseUid();
-            if (firebaseUid == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
+            var emailUsuario = ObtenerEmailUsuario();
+            if (emailUsuario == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
 
-            var (result, reportes) = await _moderacionService.GetReportes(firebaseUid, estado);
+            var (result, reportes) = await _moderacionService.GetReportes(emailUsuario, estado);
             if (!result.Exito) return Responder(result);
             return Ok(reportes);
         }
@@ -108,10 +108,10 @@ namespace EventosIAPeru.API.Controllers
         [HttpPut("reportes/{id:int}/resolver")]
         public async Task<IActionResult> ResolverReporte(int id, [FromBody] ResolverReporteDTO dto)
         {
-            var firebaseUid = ObtenerFirebaseUid();
-            if (firebaseUid == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
+            var emailUsuario = ObtenerEmailUsuario();
+            if (emailUsuario == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
 
-            var result = await _moderacionService.ResolverReporte(firebaseUid, id, dto);
+            var result = await _moderacionService.ResolverReporte(emailUsuario, id, dto);
             return Responder(result);
         }
 
@@ -121,10 +121,10 @@ namespace EventosIAPeru.API.Controllers
         [HttpGet("usuarios")]
         public async Task<IActionResult> BuscarUsuarios([FromQuery] string? texto, [FromQuery] string? estado)
         {
-            var firebaseUid = ObtenerFirebaseUid();
-            if (firebaseUid == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
+            var emailUsuario = ObtenerEmailUsuario();
+            if (emailUsuario == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
 
-            var (result, usuarios) = await _moderacionService.BuscarUsuarios(firebaseUid, texto, estado);
+            var (result, usuarios) = await _moderacionService.BuscarUsuarios(emailUsuario, texto, estado);
             if (!result.Exito) return Responder(result);
             return Ok(usuarios);
         }
@@ -133,10 +133,10 @@ namespace EventosIAPeru.API.Controllers
         [HttpPut("usuarios/{id:int}/estado")]
         public async Task<IActionResult> CambiarEstadoUsuario(int id, [FromBody] CambiarEstadoUsuarioDTO dto)
         {
-            var firebaseUid = ObtenerFirebaseUid();
-            if (firebaseUid == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
+            var emailUsuario = ObtenerEmailUsuario();
+            if (emailUsuario == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
 
-            var result = await _moderacionService.CambiarEstadoUsuario(firebaseUid, id, dto);
+            var result = await _moderacionService.CambiarEstadoUsuario(emailUsuario, id, dto);
             return Responder(result);
         }
 
@@ -144,10 +144,10 @@ namespace EventosIAPeru.API.Controllers
         [HttpPut("usuarios/{id:int}/verificar")]
         public async Task<IActionResult> VerificarUsuario(int id)
         {
-            var firebaseUid = ObtenerFirebaseUid();
-            if (firebaseUid == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
+            var emailUsuario = ObtenerEmailUsuario();
+            if (emailUsuario == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
 
-            var result = await _moderacionService.VerificarUsuario(firebaseUid, id);
+            var result = await _moderacionService.VerificarUsuario(emailUsuario, id);
             return Responder(result);
         }
 
@@ -157,10 +157,10 @@ namespace EventosIAPeru.API.Controllers
         [HttpGet("auditoria")]
         public async Task<IActionResult> GetAuditoria([FromQuery] DateTime? desde, [FromQuery] DateTime? hasta)
         {
-            var firebaseUid = ObtenerFirebaseUid();
-            if (firebaseUid == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
+            var emailUsuario = ObtenerEmailUsuario();
+            if (emailUsuario == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
 
-            var (result, registros) = await _moderacionService.GetAuditoria(firebaseUid, desde, hasta);
+            var (result, registros) = await _moderacionService.GetAuditoria(emailUsuario, desde, hasta);
             if (!result.Exito) return Responder(result);
             return Ok(registros);
         }
@@ -169,10 +169,10 @@ namespace EventosIAPeru.API.Controllers
         [HttpGet("auditoria/exportar")]
         public async Task<IActionResult> ExportarAuditoria()
         {
-            var firebaseUid = ObtenerFirebaseUid();
-            if (firebaseUid == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
+            var emailUsuario = ObtenerEmailUsuario();
+            if (emailUsuario == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
 
-            var (result, archivo) = await _moderacionService.ExportarAuditoria(firebaseUid);
+            var (result, archivo) = await _moderacionService.ExportarAuditoria(emailUsuario);
             if (!result.Exito) return Responder(result);
 
             return File(archivo!, "text/csv", "auditoria.csv");
@@ -184,10 +184,10 @@ namespace EventosIAPeru.API.Controllers
         [HttpGet("reglas")]
         public async Task<IActionResult> GetReglas()
         {
-            var firebaseUid = ObtenerFirebaseUid();
-            if (firebaseUid == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
+            var emailUsuario = ObtenerEmailUsuario();
+            if (emailUsuario == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
 
-            var (result, reglas) = await _moderacionService.GetReglas(firebaseUid);
+            var (result, reglas) = await _moderacionService.GetReglas(emailUsuario);
             if (!result.Exito) return Responder(result);
             return Ok(reglas);
         }
@@ -196,10 +196,10 @@ namespace EventosIAPeru.API.Controllers
         [HttpPost("reglas")]
         public async Task<IActionResult> CrearRegla([FromBody] CrearReglaDTO dto)
         {
-            var firebaseUid = ObtenerFirebaseUid();
-            if (firebaseUid == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
+            var emailUsuario = ObtenerEmailUsuario();
+            if (emailUsuario == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
 
-            var result = await _moderacionService.CrearRegla(firebaseUid, dto);
+            var result = await _moderacionService.CrearRegla(emailUsuario, dto);
             if (!result.Exito) return Responder(result);
 
             return StatusCode(StatusCodes.Status201Created, new { mensaje = "Regla creada.", reglaId = result.Id });
@@ -209,10 +209,10 @@ namespace EventosIAPeru.API.Controllers
         [HttpPut("reglas/{id:int}/activa")]
         public async Task<IActionResult> CambiarEstadoRegla(int id, [FromQuery] bool activa)
         {
-            var firebaseUid = ObtenerFirebaseUid();
-            if (firebaseUid == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
+            var emailUsuario = ObtenerEmailUsuario();
+            if (emailUsuario == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
 
-            var result = await _moderacionService.CambiarEstadoRegla(firebaseUid, id, activa);
+            var result = await _moderacionService.CambiarEstadoRegla(emailUsuario, id, activa);
             return Responder(result);
         }
 

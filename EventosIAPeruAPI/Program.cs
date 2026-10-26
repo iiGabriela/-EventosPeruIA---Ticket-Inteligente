@@ -4,9 +4,12 @@ using Microsoft.IdentityModel.Tokens;
 using Pgvector.EntityFrameworkCore;
 using EventosIAPeru.Core.Core.Interfaces;
 using EventosIAPeru.Core.Core.Services;
+using EventosIAPeru.Core.Core.Settings;
 using EventosIAPeru.Core.Infrastructure.Data;
 using EventosIAPeru.Core.Infrastructure.Repositories;
 using EventosIAPeru.API.Background;
+using EventosIAPeru.API.Middleware;
+using EventosIAPeru.API.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -63,21 +66,46 @@ builder.Services.AddScoped<ICompraRepository, CompraRepository>();
 builder.Services.AddScoped<ICompraService, CompraService>();
 builder.Services.AddScoped<IEntradaRepository, EntradaRepository>();
 builder.Services.AddScoped<IEntradaService, EntradaService>();
-builder.Services.AddScoped<IQrService, QrService>();
+// US-07: QR dinámico firmado (appsettings -> Qr:ClaveFirma, Qr:SegundosValidez)
+var qrSettings = builder.Configuration.GetSection("Qr").Get<QrSettings>() ?? new QrSettings();
+builder.Services.AddSingleton<IQrService>(new QrService(qrSettings));
+
+// Frontend Vue + Quasar: orígenes permitidos en appsettings.json -> Cors:Origenes
+var origenesFrontend = builder.Configuration.GetSection("Cors:Origenes").Get<string[]>() ?? Array.Empty<string>();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("Frontend", policy =>
+        policy.WithOrigins(origenesFrontend)
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              // Para que el navegador pueda leer el nombre del archivo exportado (US-12)
+              .WithExposedHeaders("Content-Disposition"));
+});
 
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+
+// Documentación OpenAPI (incluye los comentarios /// de los controllers) + esquemas de seguridad
+builder.Services.AddOpenApi(options => options.AddDocumentTransformer<SeguridadOpenApiTransformer>());
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Middleware propio: errores no controlados -> JSON { mensaje } sin trazas internas
+app.UseMiddleware<ManejoErroresMiddleware>();
+
+// Swagger UI en /swagger (solo Development)
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/openapi/v1.json", "EventosPeruIA API v1");
+        options.DocumentTitle = "EventosPeruIA API";
+    });
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("Frontend");
 
 // Primero se identifica quién es (token) y luego se revisan permisos
 app.UseAuthentication();

@@ -28,9 +28,9 @@ namespace EventosIAPeru.Core.Core.Services
 
         // ---------------------------- US-11 ----------------------------
 
-        public async Task<PanelVentasDTO?> GetPanelVentas(string firebaseUid, FiltroVentasDTO filtro)
+        public async Task<PanelVentasDTO?> GetPanelVentas(string emailUsuario, FiltroVentasDTO filtro)
         {
-            var usuario = await _usuarioRepository.GetUsuarioByFirebaseUid(firebaseUid);
+            var usuario = await _usuarioRepository.GetUsuarioByEmail(emailUsuario);
             if (usuario == null) return null;
 
             var (desde, hasta, descripcion) = ResolverPeriodo(filtro);

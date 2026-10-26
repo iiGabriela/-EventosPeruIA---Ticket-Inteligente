@@ -7,11 +7,11 @@ public partial class Usuario
 {
     public int UsuarioId { get; set; }
 
-    public string FirebaseUid { get; set; } = null!;
-
     public string Nombre { get; set; } = null!;
 
     public string Email { get; set; } = null!;
+
+    public string? Dni { get; set; }
 
     public string Estado { get; set; } = null!;
 

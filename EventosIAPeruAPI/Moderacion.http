@@ -1,21 +1,21 @@
 @host = https://localhost:7224
-@admin = uid-prueba-gabriela
+@admin = gabriela@test.com
 @eventoId = 1
 @reporteId = 1
 @usuarioId = 2
 
 ### 1) US-15 Panel con indicadores (200 si ya eres ADMINISTRADOR)
 GET {{host}}/api/moderacion/panel
-X-Firebase-Uid: {{admin}}
+X-User-Email: {{admin}}
 
 ### 2) US-15 Un usuario normal intenta entrar al panel (403)
 GET {{host}}/api/moderacion/panel
-X-Firebase-Uid: uid-usuario2
+X-User-Email: usuario2@test.com
 
 ### 3) US-15 Un usuario reporta un evento (201)
 POST {{host}}/api/moderacion/eventos/{{eventoId}}/reportar
 Content-Type: application/json
-X-Firebase-Uid: uid-usuario2
+X-User-Email: usuario2@test.com
 
 {
   "motivo": "El aforo parece mayor al permitido en la sede."
@@ -23,20 +23,20 @@ X-Firebase-Uid: uid-usuario2
 
 ### 4) US-15 Reportes pendientes (copia el reporteId de aqui)
 GET {{host}}/api/moderacion/reportes?estado=PENDIENTE
-X-Firebase-Uid: {{admin}}
+X-User-Email: {{admin}}
 
 ### 5) US-15 Lista de eventos para moderar
 GET {{host}}/api/moderacion/eventos
-X-Firebase-Uid: {{admin}}
+X-User-Email: {{admin}}
 
 ### 6) US-15 Detalle del evento (validaciones, aforo y reportes activos)
 GET {{host}}/api/moderacion/eventos/{{eventoId}}
-X-Firebase-Uid: {{admin}}
+X-User-Email: {{admin}}
 
 ### 7) US-15 Moderar SIN confirmar (400)
 PUT {{host}}/api/moderacion/eventos/{{eventoId}}/moderar
 Content-Type: application/json
-X-Firebase-Uid: {{admin}}
+X-User-Email: {{admin}}
 
 {
   "estadoModeracion": "DESACTIVADO",
@@ -47,7 +47,7 @@ X-Firebase-Uid: {{admin}}
 ### 8) US-15 Desactivar el evento confirmando (204)
 PUT {{host}}/api/moderacion/eventos/{{eventoId}}/moderar
 Content-Type: application/json
-X-Firebase-Uid: {{admin}}
+X-User-Email: {{admin}}
 
 {
   "estadoModeracion": "DESACTIVADO",
@@ -58,7 +58,7 @@ X-Firebase-Uid: {{admin}}
 ### 9) US-15 Volver a aprobarlo (204)
 PUT {{host}}/api/moderacion/eventos/{{eventoId}}/moderar
 Content-Type: application/json
-X-Firebase-Uid: {{admin}}
+X-User-Email: {{admin}}
 
 {
   "estadoModeracion": "CONFORME",
@@ -68,7 +68,7 @@ X-Firebase-Uid: {{admin}}
 ### 10) US-15 Resolver el reporte (204)
 PUT {{host}}/api/moderacion/reportes/{{reporteId}}/resolver
 Content-Type: application/json
-X-Firebase-Uid: {{admin}}
+X-User-Email: {{admin}}
 
 {
   "estado": "RESUELTO",
@@ -78,12 +78,12 @@ X-Firebase-Uid: {{admin}}
 
 ### 11) US-15 Buscar usuarios por nombre o correo
 GET {{host}}/api/moderacion/usuarios?texto=usuario
-X-Firebase-Uid: {{admin}}
+X-User-Email: {{admin}}
 
 ### 12) US-15 Bloquear una cuenta (204). Cambia @usuarioId por el id del usuario 2
 PUT {{host}}/api/moderacion/usuarios/{{usuarioId}}/estado
 Content-Type: application/json
-X-Firebase-Uid: {{admin}}
+X-User-Email: {{admin}}
 
 {
   "estado": "BLOQUEADO",
@@ -93,12 +93,12 @@ X-Firebase-Uid: {{admin}}
 
 ### 13) US-02 + US-15 El usuario bloqueado ya no puede usar su cuenta (403)
 GET {{host}}/api/usuario/me
-X-Firebase-Uid: uid-usuario2
+X-User-Email: usuario2@test.com
 
 ### 14) US-15 Reactivar la cuenta (204)
 PUT {{host}}/api/moderacion/usuarios/{{usuarioId}}/estado
 Content-Type: application/json
-X-Firebase-Uid: {{admin}}
+X-User-Email: {{admin}}
 
 {
   "estado": "ACTIVO",
@@ -107,20 +107,20 @@ X-Firebase-Uid: {{admin}}
 
 ### 15) US-15 Verificar una cuenta (204)
 PUT {{host}}/api/moderacion/usuarios/{{usuarioId}}/verificar
-X-Firebase-Uid: {{admin}}
+X-User-Email: {{admin}}
 
 ### 16) US-15 Log de auditoria
 GET {{host}}/api/moderacion/auditoria
-X-Firebase-Uid: {{admin}}
+X-User-Email: {{admin}}
 
 ### 17) US-15 Exportar el log de auditoria (descarga auditoria.csv)
 GET {{host}}/api/moderacion/auditoria/exportar
-X-Firebase-Uid: {{admin}}
+X-User-Email: {{admin}}
 
 ### 18) US-15 Crear regla simple: aforo mayor a 5000 pasa a revision (201)
 POST {{host}}/api/moderacion/reglas
 Content-Type: application/json
-X-Firebase-Uid: {{admin}}
+X-User-Email: {{admin}}
 
 {
   "nombre": "Aforo muy alto",
@@ -135,7 +135,7 @@ X-Firebase-Uid: {{admin}}
 ### 19) US-15 Crear regla de IA (solo criterio en texto) (201)
 POST {{host}}/api/moderacion/reglas
 Content-Type: application/json
-X-Firebase-Uid: {{admin}}
+X-User-Email: {{admin}}
 
 {
   "nombre": "Contenido enganoso",
@@ -146,8 +146,8 @@ X-Firebase-Uid: {{admin}}
 
 ### 20) US-15 Ver reglas
 GET {{host}}/api/moderacion/reglas
-X-Firebase-Uid: {{admin}}
+X-User-Email: {{admin}}
 
 ### 21) US-15 Desactivar una regla (204). Cambia el 1 por el id de la regla
 PUT {{host}}/api/moderacion/reglas/1/activa?activa=false
-X-Firebase-Uid: {{admin}}
+X-User-Email: {{admin}}

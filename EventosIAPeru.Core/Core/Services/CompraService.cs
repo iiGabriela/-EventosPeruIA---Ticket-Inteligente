@@ -18,16 +18,21 @@ public class CompraService : ICompraService
         _qrService = qrService;
     }
 
-    public async Task<ResultadoOperacion> CrearCompra(string firebaseUid, CrearCompraDTO dto)
+    public async Task<ResultadoOperacion> CrearCompra(string emailUsuario, CrearCompraDTO dto)
     {
-        var usuario = await _usuarioRepository.GetUsuarioByFirebaseUid(firebaseUid);
+        var usuario = await _usuarioRepository.GetUsuarioByEmail(emailUsuario);
         if (usuario == null) return ResultadoOperacion.NoAutorizado("Usuario no encontrado.");
+        if (usuario.Estado != "ACTIVO") return ResultadoOperacion.NoAutorizado("Tu cuenta no está activa.");
 
         if (dto.Cantidad < 1 || dto.Cantidad > 4)
             return ResultadoOperacion.Invalido("La cantidad debe estar entre 1 y 4.");
 
         if (dto.Asistentes.Count != dto.Cantidad)
             return ResultadoOperacion.Invalido("Debes enviar los datos de cada asistente.");
+
+        // US-06: cada entrada necesita titular y documento
+        if (dto.Asistentes.Any(a => string.IsNullOrWhiteSpace(a.TitularNombre) || string.IsNullOrWhiteSpace(a.TitularDocumento)))
+            return ResultadoOperacion.Invalido("Cada entrada debe tener nombre y documento del titular.");
 
         var metodos = new[] { "TARJETA", "YAPE", "PLIN" };
         if (!metodos.Contains(dto.MetodoPago?.ToUpper()))
@@ -44,6 +49,9 @@ public class CompraService : ICompraService
 
         if (evento.Estado != "PUBLICADO" && evento.Estado != "ACTIVO")
             return ResultadoOperacion.Invalido("El evento no está disponible para la venta.");
+
+        if (evento.EstadoModeracion == "DESACTIVADO")
+            return ResultadoOperacion.Invalido("El evento fue desactivado por moderación.");
 
         if (evento.FechaInicio <= DateTime.UtcNow)
             return ResultadoOperacion.Invalido("El evento ya comenzó.");
@@ -69,39 +77,43 @@ public class CompraService : ICompraService
             compra.Entrada.Add(new Entrada
             {
                 CodigoQr = _qrService.GenerarCodigoQr(),
-                TitularNombre = asistente.TitularNombre,
-                TitularDocumento = asistente.TitularDocumento,
+                TitularNombre = asistente.TitularNombre.Trim(),
+                TitularDocumento = asistente.TitularDocumento.Trim(),
                 TipoAcceso = string.IsNullOrWhiteSpace(asistente.TipoAcceso) ? "GENERAL" : asistente.TipoAcceso.ToUpper(),
                 Estado = "VALIDA",
                 FechaGeneracion = DateTime.UtcNow
             });
         }
 
-        var compraId = await _compraRepository.CrearCompraConEntradas(compra);
+        // El aforo se vuelve a validar con bloqueo dentro de la transacción (US-09)
+        var compraId = await _compraRepository.CrearCompraConEntradas(compra, evento.AforoTotal);
+        if (compraId == null)
+            return ResultadoOperacion.Invalido("No hay suficientes entradas disponibles.");
+
         return ResultadoOperacion.Ok(compraId);
     }
 
-    public async Task<ResultadoOperacion> GetMisCompras(string firebaseUid)
+    public async Task<(ResultadoOperacion Resultado, List<CompraDTO>? Compras)> GetMisCompras(string emailUsuario)
     {
-        var usuario = await _usuarioRepository.GetUsuarioByFirebaseUid(firebaseUid);
-        if (usuario == null) return ResultadoOperacion.NoAutorizado("Usuario no encontrado.");
+        var usuario = await _usuarioRepository.GetUsuarioByEmail(emailUsuario);
+        if (usuario == null) return (ResultadoOperacion.NoAutorizado("Usuario no encontrado."), null);
 
         var compras = await _compraRepository.GetComprasDeUsuario(usuario.UsuarioId);
-        return ResultadoOperacion.Ok();
+        return (ResultadoOperacion.Ok(), compras.Select(MapearCompra).ToList());
     }
 
-    public async Task<ResultadoOperacion> GetCompraPorId(string firebaseUid, int compraId)
+    public async Task<(ResultadoOperacion Resultado, CompraDTO? Compra)> GetCompraPorId(string emailUsuario, int compraId)
     {
-        var usuario = await _usuarioRepository.GetUsuarioByFirebaseUid(firebaseUid);
-        if (usuario == null) return ResultadoOperacion.NoAutorizado("Usuario no encontrado.");
+        var usuario = await _usuarioRepository.GetUsuarioByEmail(emailUsuario);
+        if (usuario == null) return (ResultadoOperacion.NoAutorizado("Usuario no encontrado."), null);
 
         var compra = await _compraRepository.GetCompraPorId(compraId);
-        if (compra == null) return ResultadoOperacion.NoEncontrado("Compra no encontrada.");
+        if (compra == null) return (ResultadoOperacion.NoEncontrado("Compra no encontrada."), null);
 
         if (compra.UsuarioId != usuario.UsuarioId)
-            return ResultadoOperacion.NoAutorizado("Esta compra no te pertenece.");
+            return (ResultadoOperacion.NoAutorizado("Esta compra no te pertenece."), null);
 
-        return ResultadoOperacion.Ok(compra.CompraId);
+        return (ResultadoOperacion.Ok(compra.CompraId), MapearCompra(compra));
     }
 
     private static CompraDTO MapearCompra(Compra compra)
@@ -118,10 +130,17 @@ public class CompraService : ICompraService
             MetodoPago = compra.MetodoPago,
             Estado = compra.Estado,
             FechaCompra = compra.FechaCompra,
+            // El QR no se incluye: se pide a GET /api/Entrada/{id}/qr (US-07)
             Entradas = compra.Entrada.Select(e => new EntradaDTO
             {
                 EntradaId = e.EntradaId,
-                CodigoQr = e.CodigoQr,
+                CompraId = compra.CompraId,
+                EventoId = compra.EventoId,
+                EventoNombre = compra.Evento?.Nombre ?? string.Empty,
+                FechaInicio = compra.Evento?.FechaInicio ?? default,
+                Sede = compra.Evento?.Sede ?? string.Empty,
+                Direccion = compra.Evento?.Direccion ?? string.Empty,
+                MontoPagado = compra.PrecioUnitario,
                 TitularNombre = e.TitularNombre,
                 TitularDocumento = e.TitularDocumento,
                 TipoAcceso = e.TipoAcceso,

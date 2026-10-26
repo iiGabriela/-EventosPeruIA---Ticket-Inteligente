@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="EventosIAPeru.Core/EventosIAPeru.Core.csproj" />
+  <Project Path="EventosIAPeru.Tests/EventosIAPeru.Tests.csproj" />
   <Project Path="EventosIAPeruAPI/EventosIAPeru.API.csproj" />
 </Solution>

@@ -21,9 +21,9 @@ public class NotificacionService : INotificacionService
         _usuarioRepository = usuarioRepository;
     }
 
-    public async Task<List<NotificacionDTO>?> ObtenerMisNotificaciones(string firebaseUid)
+    public async Task<List<NotificacionDTO>?> ObtenerMisNotificaciones(string emailUsuario)
     {
-        var usuario = await _usuarioRepository.GetUsuarioByFirebaseUid(firebaseUid);
+        var usuario = await _usuarioRepository.GetUsuarioByEmail(emailUsuario);
         if (usuario == null)
             return null;
 
@@ -34,9 +34,9 @@ public class NotificacionService : INotificacionService
         return notificaciones.Select(Mapear).ToList();
     }
 
-    public async Task<ResultadoOperacion> MarcarComoLeida(string firebaseUid, int notificacionId)
+    public async Task<ResultadoOperacion> MarcarComoLeida(string emailUsuario, int notificacionId)
     {
-        var usuario = await _usuarioRepository.GetUsuarioByFirebaseUid(firebaseUid);
+        var usuario = await _usuarioRepository.GetUsuarioByEmail(emailUsuario);
         if (usuario == null)
             return ResultadoOperacion.NoAutorizado("Tu usuario no está registrado.");
 
@@ -50,9 +50,9 @@ public class NotificacionService : INotificacionService
         return ResultadoOperacion.Ok(notificacionId);
     }
 
-    public async Task<ResultadoOperacion> MarcarTodasComoLeidas(string firebaseUid)
+    public async Task<ResultadoOperacion> MarcarTodasComoLeidas(string emailUsuario)
     {
-        var usuario = await _usuarioRepository.GetUsuarioByFirebaseUid(firebaseUid);
+        var usuario = await _usuarioRepository.GetUsuarioByEmail(emailUsuario);
         if (usuario == null)
             return ResultadoOperacion.NoAutorizado("Tu usuario no está registrado.");
 

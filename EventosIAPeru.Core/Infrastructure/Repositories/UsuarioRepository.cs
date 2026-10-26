@@ -19,24 +19,25 @@ namespace EventosIAPeru.Core.Infrastructure.Repositories
         }
 
        
-        public async Task<Usuario?> GetUsuarioByFirebaseUid(string firebaseUid)
+        // Busca al usuario por su correo (es único en la base, guardado en minúsculas)
+        public async Task<Usuario?> GetUsuarioByEmail(string email)
         {
             var usuario = await _dbContext
                                 .Usuario
                                 .AsNoTracking()
-                                .Where(u => u.FirebaseUid == firebaseUid)
+                                .Where(u => u.Email == email.Trim().ToLower())
                                 .FirstOrDefaultAsync();
             return usuario;
         }
 
-        // Busca al usuario por su UID de Firebase e incluye sus roles
-        public async Task<Usuario?> GetUsuarioConRoles(string firebaseUid)
+        // Busca al usuario por su correo e incluye sus roles
+        public async Task<Usuario?> GetUsuarioConRoles(string email)
         {
             return await _dbContext
                             .Usuario
                             .AsNoTracking()
                             .Include(u => u.Rol)
-                            .Where(u => u.FirebaseUid == firebaseUid)
+                            .Where(u => u.Email == email.Trim().ToLower())
                             .FirstOrDefaultAsync();
         }
 
@@ -47,6 +48,14 @@ namespace EventosIAPeru.Core.Infrastructure.Repositories
             return await _dbContext
                             .Usuario
                             .AnyAsync(u => u.Email.ToLower() == emailNormalizado);
+        }
+
+        // US-01: el DNI también es único
+        public async Task<bool> ExisteDni(string dni)
+        {
+            return await _dbContext
+                            .Usuario
+                            .AnyAsync(u => u.Dni == dni);
         }
 
         // Guarda el usuario y le asigna el rol inicial en la tabla usuario_rol

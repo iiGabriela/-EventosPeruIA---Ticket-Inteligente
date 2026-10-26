@@ -20,11 +20,11 @@ public class NotificacionController : BaseApiController
     [HttpGet]
     public async Task<IActionResult> GetMisNotificaciones()
     {
-        var firebaseUid = ObtenerFirebaseUid();
-        if (firebaseUid == null)
+        var emailUsuario = ObtenerEmailUsuario();
+        if (emailUsuario == null)
             return Unauthorized(new { mensaje = "Debe iniciar sesión." });
 
-        var notificaciones = await _notificacionService.ObtenerMisNotificaciones(firebaseUid);
+        var notificaciones = await _notificacionService.ObtenerMisNotificaciones(emailUsuario);
         if (notificaciones == null)
             return NotFound(new { mensaje = "Tu usuario no está registrado." });
 
@@ -40,21 +40,21 @@ public class NotificacionController : BaseApiController
     [HttpPut("{id:int}/leer")]
     public async Task<IActionResult> MarcarComoLeida(int id)
     {
-        var firebaseUid = ObtenerFirebaseUid();
-        if (firebaseUid == null)
+        var emailUsuario = ObtenerEmailUsuario();
+        if (emailUsuario == null)
             return Unauthorized(new { mensaje = "Debe iniciar sesión." });
 
-        return Responder(await _notificacionService.MarcarComoLeida(firebaseUid, id));
+        return Responder(await _notificacionService.MarcarComoLeida(emailUsuario, id));
     }
 
     /// <summary>Marca todas las notificaciones propias como leídas.</summary>
     [HttpPut("leer-todas")]
     public async Task<IActionResult> MarcarTodasComoLeidas()
     {
-        var firebaseUid = ObtenerFirebaseUid();
-        if (firebaseUid == null)
+        var emailUsuario = ObtenerEmailUsuario();
+        if (emailUsuario == null)
             return Unauthorized(new { mensaje = "Debe iniciar sesión." });
 
-        return Responder(await _notificacionService.MarcarTodasComoLeidas(firebaseUid));
+        return Responder(await _notificacionService.MarcarTodasComoLeidas(emailUsuario));
     }
 }

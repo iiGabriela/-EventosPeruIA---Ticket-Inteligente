@@ -21,11 +21,11 @@ namespace EventosIAPeru.API.Controllers
         [HttpGet("panel")]
         public async Task<IActionResult> GetPanelVentas([FromQuery] FiltroVentasDTO filtro)
         {
-            var firebaseUid = ObtenerFirebaseUid();
-            if (firebaseUid == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
+            var emailUsuario = ObtenerEmailUsuario();
+            if (emailUsuario == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
             if (!FechasValidas(filtro)) return BadRequest(new { mensaje = "La fecha 'desde' no puede ser mayor que la fecha 'hasta'." });
 
-            var panel = await _ventaService.GetPanelVentas(firebaseUid, filtro);
+            var panel = await _ventaService.GetPanelVentas(emailUsuario, filtro);
             if (panel == null) return NotFound(new { mensaje = "Tu usuario no está registrado." });
             return Ok(panel);
         }
@@ -34,11 +34,11 @@ namespace EventosIAPeru.API.Controllers
         [HttpGet("exportar/excel")]
         public async Task<IActionResult> ExportarExcel([FromQuery] FiltroVentasDTO filtro)
         {
-            var firebaseUid = ObtenerFirebaseUid();
-            if (firebaseUid == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
+            var emailUsuario = ObtenerEmailUsuario();
+            if (emailUsuario == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
             if (!FechasValidas(filtro)) return BadRequest(new { mensaje = "La fecha 'desde' no puede ser mayor que la fecha 'hasta'." });
 
-            var panel = await _ventaService.GetPanelVentas(firebaseUid, filtro);
+            var panel = await _ventaService.GetPanelVentas(emailUsuario, filtro);
             if (panel == null) return NotFound(new { mensaje = "Tu usuario no está registrado." });
             if (panel.EntradasVendidas == 0) return NotFound(new { mensaje = "No existen ventas para el periodo seleccionado." });
 
@@ -51,11 +51,11 @@ namespace EventosIAPeru.API.Controllers
         [HttpGet("exportar/pdf")]
         public async Task<IActionResult> ExportarPdf([FromQuery] FiltroVentasDTO filtro)
         {
-            var firebaseUid = ObtenerFirebaseUid();
-            if (firebaseUid == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
+            var emailUsuario = ObtenerEmailUsuario();
+            if (emailUsuario == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
             if (!FechasValidas(filtro)) return BadRequest(new { mensaje = "La fecha 'desde' no puede ser mayor que la fecha 'hasta'." });
 
-            var panel = await _ventaService.GetPanelVentas(firebaseUid, filtro);
+            var panel = await _ventaService.GetPanelVentas(emailUsuario, filtro);
             if (panel == null) return NotFound(new { mensaje = "Tu usuario no está registrado." });
             if (panel.EntradasVendidas == 0) return NotFound(new { mensaje = "No existen ventas para el periodo seleccionado." });
 

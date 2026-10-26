@@ -27,14 +27,14 @@ namespace EventosIAPeru.API.Controllers
         [HttpPost("registro")]
         public async Task<IActionResult> Registrar([FromBody] RegistroUsuarioDTO dto)
         {
-            var firebaseUid = ObtenerFirebaseUid();
-            if (firebaseUid == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
+            var emailUsuario = ObtenerEmailUsuario();
+            if (emailUsuario == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
 
-            var result = await _usuarioService.Registrar(firebaseUid, dto);
+            var result = await _usuarioService.Registrar(emailUsuario, dto);
             if (!result.Exito) return Responder(result);
 
             // Devolvemos el perfil creado con un mensaje de confirmación
-            var (_, perfil) = await _usuarioService.ObtenerPerfil(firebaseUid);
+            var (_, perfil) = await _usuarioService.ObtenerPerfil(emailUsuario);
             return CreatedAtAction(nameof(GetMiPerfil), null, new { mensaje = "Cuenta creada correctamente.", usuario = perfil });
         }
 
@@ -44,10 +44,10 @@ namespace EventosIAPeru.API.Controllers
         [HttpGet("me")]
         public async Task<IActionResult> GetMiPerfil()
         {
-            var firebaseUid = ObtenerFirebaseUid();
-            if (firebaseUid == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
+            var emailUsuario = ObtenerEmailUsuario();
+            if (emailUsuario == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
 
-            var (result, perfil) = await _usuarioService.ObtenerPerfil(firebaseUid);
+            var (result, perfil) = await _usuarioService.ObtenerPerfil(emailUsuario);
             if (!result.Exito) return Responder(result);
 
             return Ok(perfil);
@@ -59,13 +59,13 @@ namespace EventosIAPeru.API.Controllers
         [HttpPost("me/rol-organizador")]
         public async Task<IActionResult> ActivarRolOrganizador()
         {
-            var firebaseUid = ObtenerFirebaseUid();
-            if (firebaseUid == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
+            var emailUsuario = ObtenerEmailUsuario();
+            if (emailUsuario == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
 
-            var result = await _usuarioService.ActivarRolOrganizador(firebaseUid);
+            var result = await _usuarioService.ActivarRolOrganizador(emailUsuario);
             if (!result.Exito) return Responder(result);
 
-            var (_, perfil) = await _usuarioService.ObtenerPerfil(firebaseUid);
+            var (_, perfil) = await _usuarioService.ObtenerPerfil(emailUsuario);
             return Ok(perfil);
         }
 
@@ -73,10 +73,10 @@ namespace EventosIAPeru.API.Controllers
         [HttpPost("me/cambiar-rol")]
         public async Task<IActionResult> CambiarRol([FromBody] CambiarRolDTO dto)
         {
-            var firebaseUid = ObtenerFirebaseUid();
-            if (firebaseUid == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
+            var emailUsuario = ObtenerEmailUsuario();
+            if (emailUsuario == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
 
-            var (result, cambio) = await _usuarioService.CambiarRolActivo(firebaseUid, dto.Rol);
+            var (result, cambio) = await _usuarioService.CambiarRolActivo(emailUsuario, dto.Rol);
             if (!result.Exito) return Responder(result);
 
             return Ok(cambio);

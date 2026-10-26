@@ -24,29 +24,28 @@ namespace EventosIAPeru.Core.Core.Services
 
         // ---------------------------- US-01 ----------------------------
 
-        public async Task<ResultadoOperacion> Registrar(string firebaseUid, RegistroUsuarioDTO dto)
+        public async Task<ResultadoOperacion> Registrar(string emailUsuario, RegistroUsuarioDTO dto)
         {
             // Limpiamos espacios y dejamos el correo en minúsculas
             var nombre = dto.Nombre.Trim();
-            var email = dto.Email.Trim().ToLowerInvariant();
+            var email = emailUsuario.Trim().ToLowerInvariant();
 
             if (nombre.Length < 2)
                 return ResultadoOperacion.Invalido("El nombre debe tener al menos 2 caracteres.");
 
-            // La misma cuenta de Firebase no puede registrarse dos veces
-            var existente = await _usuarioRepository.GetUsuarioByFirebaseUid(firebaseUid);
-            if (existente != null)
+            // El correo identifica la cuenta: no se puede registrar dos veces
+            if (await _usuarioRepository.ExisteEmail(email))
                 return ResultadoOperacion.Invalido("Esta cuenta ya está registrada.");
 
-            // El correo debe ser único en el sistema
-            if (await _usuarioRepository.ExisteEmail(email))
-                return ResultadoOperacion.Invalido("El correo ya está registrado.");
+            var dni = dto.Dni.Trim();
+            if (await _usuarioRepository.ExisteDni(dni))
+                return ResultadoOperacion.Invalido("El DNI ya está registrado en otra cuenta.");
 
             var usuario = new Usuario
             {
-                FirebaseUid = firebaseUid,
                 Nombre = nombre,
                 Email = email,
+                Dni = dni,
                 Estado = "ACTIVO",
                 Verificado = false,
                 FechaRegistro = DateTime.UtcNow
@@ -62,9 +61,9 @@ namespace EventosIAPeru.Core.Core.Services
 
         // ---------------------------- US-02 ----------------------------
 
-        public async Task<(ResultadoOperacion Resultado, UsuarioDTO? Usuario)> ObtenerPerfil(string firebaseUid)
+        public async Task<(ResultadoOperacion Resultado, UsuarioDTO? Usuario)> ObtenerPerfil(string emailUsuario)
         {
-            var (usuario, error) = await ObtenerUsuarioActivo(firebaseUid);
+            var (usuario, error) = await ObtenerUsuarioActivo(emailUsuario);
             if (error != null) return (error, null);
 
             return (ResultadoOperacion.Ok(usuario!.UsuarioId), Mapear(usuario));
@@ -72,9 +71,9 @@ namespace EventosIAPeru.Core.Core.Services
 
         // ---------------------------- US-03 ----------------------------
 
-        public async Task<ResultadoOperacion> ActivarRolOrganizador(string firebaseUid)
+        public async Task<ResultadoOperacion> ActivarRolOrganizador(string emailUsuario)
         {
-            var (usuario, error) = await ObtenerUsuarioActivo(firebaseUid);
+            var (usuario, error) = await ObtenerUsuarioActivo(emailUsuario);
             if (error != null) return error;
 
             // Si ya lo tiene no pasa nada, no hace falta otra cuenta
@@ -88,9 +87,9 @@ namespace EventosIAPeru.Core.Core.Services
             return ResultadoOperacion.Ok(usuario.UsuarioId);
         }
 
-        public async Task<(ResultadoOperacion Resultado, CambioRolDTO? Cambio)> CambiarRolActivo(string firebaseUid, string rol)
+        public async Task<(ResultadoOperacion Resultado, CambioRolDTO? Cambio)> CambiarRolActivo(string emailUsuario, string rol)
         {
-            var (usuario, error) = await ObtenerUsuarioActivo(firebaseUid);
+            var (usuario, error) = await ObtenerUsuarioActivo(emailUsuario);
             if (error != null) return (error, null);
 
             var rolPedido = rol.Trim().ToUpperInvariant();
@@ -113,9 +112,9 @@ namespace EventosIAPeru.Core.Core.Services
         // ---------------------------- Ayudantes ----------------------------
 
         // Busca al usuario y revisa que exista y esté ACTIVO (un bloqueado no puede usar la cuenta)
-        private async Task<(Usuario? Usuario, ResultadoOperacion? Error)> ObtenerUsuarioActivo(string firebaseUid)
+        private async Task<(Usuario? Usuario, ResultadoOperacion? Error)> ObtenerUsuarioActivo(string emailUsuario)
         {
-            var usuario = await _usuarioRepository.GetUsuarioConRoles(firebaseUid);
+            var usuario = await _usuarioRepository.GetUsuarioConRoles(emailUsuario);
             if (usuario == null)
                 return (null, ResultadoOperacion.NoEncontrado("Tu usuario no está registrado. Completa tu registro."));
 
@@ -133,6 +132,7 @@ namespace EventosIAPeru.Core.Core.Services
                 UsuarioId = u.UsuarioId,
                 Nombre = u.Nombre,
                 Email = u.Email,
+                Dni = u.Dni,
                 Estado = u.Estado,
                 Verificado = u.Verificado,
                 FechaRegistro = u.FechaRegistro,

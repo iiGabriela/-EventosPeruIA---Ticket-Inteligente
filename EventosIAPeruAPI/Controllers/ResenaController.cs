@@ -21,10 +21,10 @@ namespace EventosIAPeru.API.Controllers
         [HttpPost]
         public async Task<IActionResult> CrearResena([FromBody] CrearResenaDTO dto)
         {
-            var firebaseUid = ObtenerFirebaseUid();
-            if (firebaseUid == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
+            var emailUsuario = ObtenerEmailUsuario();
+            if (emailUsuario == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
 
-            var result = await _resenaService.CrearResena(firebaseUid, dto);
+            var result = await _resenaService.CrearResena(emailUsuario, dto);
             if (!result.Exito) return Responder(result);
 
             return CreatedAtAction(nameof(GetResenasDeEvento),
@@ -45,10 +45,10 @@ namespace EventosIAPeru.API.Controllers
         [HttpGet("mias")]
         public async Task<IActionResult> GetMisResenas()
         {
-            var firebaseUid = ObtenerFirebaseUid();
-            if (firebaseUid == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
+            var emailUsuario = ObtenerEmailUsuario();
+            if (emailUsuario == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
 
-            var resenas = await _resenaService.GetMisResenas(firebaseUid);
+            var resenas = await _resenaService.GetMisResenas(emailUsuario);
             if (resenas == null) return NotFound(new { mensaje = "Tu usuario no está registrado." });
             return Ok(resenas);
         }
@@ -57,10 +57,10 @@ namespace EventosIAPeru.API.Controllers
         [HttpGet("pendientes")]
         public async Task<IActionResult> GetPendientes()
         {
-            var firebaseUid = ObtenerFirebaseUid();
-            if (firebaseUid == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
+            var emailUsuario = ObtenerEmailUsuario();
+            if (emailUsuario == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
 
-            var pendientes = await _resenaService.GetPendientes(firebaseUid);
+            var pendientes = await _resenaService.GetPendientes(emailUsuario);
             if (pendientes == null) return NotFound(new { mensaje = "Tu usuario no está registrado." });
             return Ok(pendientes);
         }

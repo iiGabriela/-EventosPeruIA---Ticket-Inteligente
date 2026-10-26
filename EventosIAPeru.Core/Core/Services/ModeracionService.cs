@@ -35,9 +35,9 @@ namespace EventosIAPeru.Core.Core.Services
 
         // ---------------------------- Panel ----------------------------
 
-        public async Task<(ResultadoOperacion Resultado, PanelModeracionDTO? Panel)> GetPanel(string firebaseUid)
+        public async Task<(ResultadoOperacion Resultado, PanelModeracionDTO? Panel)> GetPanel(string emailUsuario)
         {
-            var (admin, error) = await ObtenerAdmin(firebaseUid);
+            var (admin, error) = await ObtenerAdmin(emailUsuario);
             if (error != null) return (error, null);
 
             var ind = await _moderacionRepository.GetIndicadores();
@@ -57,9 +57,9 @@ namespace EventosIAPeru.Core.Core.Services
 
         // ---------------------------- Eventos ----------------------------
 
-        public async Task<(ResultadoOperacion Resultado, ModeracionEventosDTO? Pagina)> BuscarEventos(string firebaseUid, string? estadoModeracion, string? texto, int pagina)
+        public async Task<(ResultadoOperacion Resultado, ModeracionEventosDTO? Pagina)> BuscarEventos(string emailUsuario, string? estadoModeracion, string? texto, int pagina)
         {
-            var (admin, error) = await ObtenerAdmin(firebaseUid);
+            var (admin, error) = await ObtenerAdmin(emailUsuario);
             if (error != null) return (error, null);
 
             if (pagina < 1) pagina = 1;
@@ -87,9 +87,9 @@ namespace EventosIAPeru.Core.Core.Services
             return (ResultadoOperacion.Ok(admin!.UsuarioId), resultado);
         }
 
-        public async Task<(ResultadoOperacion Resultado, DetalleEventoModeracionDTO? Detalle)> GetDetalleEvento(string firebaseUid, int eventoId)
+        public async Task<(ResultadoOperacion Resultado, DetalleEventoModeracionDTO? Detalle)> GetDetalleEvento(string emailUsuario, int eventoId)
         {
-            var (admin, error) = await ObtenerAdmin(firebaseUid);
+            var (admin, error) = await ObtenerAdmin(emailUsuario);
             if (error != null) return (error, null);
 
             var evento = await _moderacionRepository.GetEventoDetalle(eventoId);
@@ -115,9 +115,9 @@ namespace EventosIAPeru.Core.Core.Services
             return (ResultadoOperacion.Ok(evento.EventoId), detalle);
         }
 
-        public async Task<ResultadoOperacion> ModerarEvento(string firebaseUid, int eventoId, ModerarEventoDTO dto)
+        public async Task<ResultadoOperacion> ModerarEvento(string emailUsuario, int eventoId, ModerarEventoDTO dto)
         {
-            var (admin, error) = await ObtenerAdmin(firebaseUid);
+            var (admin, error) = await ObtenerAdmin(emailUsuario);
             if (error != null) return error;
 
             // Pedimos confirmación antes de moderar
@@ -158,9 +158,9 @@ namespace EventosIAPeru.Core.Core.Services
         // ---------------------------- Reportes ----------------------------
 
         // Este lo puede usar cualquier usuario activo (no hace falta ser admin)
-        public async Task<ResultadoOperacion> ReportarEvento(string firebaseUid, int eventoId, CrearReporteDTO dto)
+        public async Task<ResultadoOperacion> ReportarEvento(string emailUsuario, int eventoId, CrearReporteDTO dto)
         {
-            var usuario = await _usuarioRepository.GetUsuarioByFirebaseUid(firebaseUid);
+            var usuario = await _usuarioRepository.GetUsuarioByEmail(emailUsuario);
             if (usuario == null) return ResultadoOperacion.NoAutorizado("Tu usuario no está registrado.");
             if (usuario.Estado != "ACTIVO") return ResultadoOperacion.NoAutorizado("Tu cuenta no está activa.");
 
@@ -192,18 +192,18 @@ namespace EventosIAPeru.Core.Core.Services
             return ResultadoOperacion.Ok(reporte.ReporteId);
         }
 
-        public async Task<(ResultadoOperacion Resultado, List<ReporteDTO>? Reportes)> GetReportes(string firebaseUid, string? estado)
+        public async Task<(ResultadoOperacion Resultado, List<ReporteDTO>? Reportes)> GetReportes(string emailUsuario, string? estado)
         {
-            var (admin, error) = await ObtenerAdmin(firebaseUid);
+            var (admin, error) = await ObtenerAdmin(emailUsuario);
             if (error != null) return (error, null);
 
             var reportes = await _moderacionRepository.GetReportes(estado?.Trim().ToUpperInvariant());
             return (ResultadoOperacion.Ok(admin!.UsuarioId), reportes.Select(r => MapearReporte(r, r.Evento?.Nombre)).ToList());
         }
 
-        public async Task<ResultadoOperacion> ResolverReporte(string firebaseUid, int reporteId, ResolverReporteDTO dto)
+        public async Task<ResultadoOperacion> ResolverReporte(string emailUsuario, int reporteId, ResolverReporteDTO dto)
         {
-            var (admin, error) = await ObtenerAdmin(firebaseUid);
+            var (admin, error) = await ObtenerAdmin(emailUsuario);
             if (error != null) return error;
 
             if (!dto.Confirmado)
@@ -241,9 +241,9 @@ namespace EventosIAPeru.Core.Core.Services
 
         // ---------------------------- Usuarios ----------------------------
 
-        public async Task<(ResultadoOperacion Resultado, List<UsuarioDTO>? Usuarios)> BuscarUsuarios(string firebaseUid, string? texto, string? estado)
+        public async Task<(ResultadoOperacion Resultado, List<UsuarioDTO>? Usuarios)> BuscarUsuarios(string emailUsuario, string? texto, string? estado)
         {
-            var (admin, error) = await ObtenerAdmin(firebaseUid);
+            var (admin, error) = await ObtenerAdmin(emailUsuario);
             if (error != null) return (error, null);
 
             var usuarios = await _moderacionRepository.BuscarUsuarios(texto, estado?.Trim().ToUpperInvariant(), 50);
@@ -262,9 +262,9 @@ namespace EventosIAPeru.Core.Core.Services
             return (ResultadoOperacion.Ok(admin!.UsuarioId), lista);
         }
 
-        public async Task<ResultadoOperacion> CambiarEstadoUsuario(string firebaseUid, int usuarioId, CambiarEstadoUsuarioDTO dto)
+        public async Task<ResultadoOperacion> CambiarEstadoUsuario(string emailUsuario, int usuarioId, CambiarEstadoUsuarioDTO dto)
         {
-            var (admin, error) = await ObtenerAdmin(firebaseUid);
+            var (admin, error) = await ObtenerAdmin(emailUsuario);
             if (error != null) return error;
 
             if (!dto.Confirmado)
@@ -297,9 +297,9 @@ namespace EventosIAPeru.Core.Core.Services
             return ResultadoOperacion.Ok(usuario.UsuarioId);
         }
 
-        public async Task<ResultadoOperacion> VerificarUsuario(string firebaseUid, int usuarioId)
+        public async Task<ResultadoOperacion> VerificarUsuario(string emailUsuario, int usuarioId)
         {
-            var (admin, error) = await ObtenerAdmin(firebaseUid);
+            var (admin, error) = await ObtenerAdmin(emailUsuario);
             if (error != null) return error;
 
             var usuario = await _moderacionRepository.GetUsuarioParaModerar(usuarioId);
@@ -319,9 +319,9 @@ namespace EventosIAPeru.Core.Core.Services
 
         // ---------------------------- Auditoría ----------------------------
 
-        public async Task<(ResultadoOperacion Resultado, List<AuditoriaDTO>? Registros)> GetAuditoria(string firebaseUid, DateTime? desde, DateTime? hasta)
+        public async Task<(ResultadoOperacion Resultado, List<AuditoriaDTO>? Registros)> GetAuditoria(string emailUsuario, DateTime? desde, DateTime? hasta)
         {
-            var (admin, error) = await ObtenerAdmin(firebaseUid);
+            var (admin, error) = await ObtenerAdmin(emailUsuario);
             if (error != null) return (error, null);
 
             var registros = await _moderacionRepository.GetAuditoria(AUtc(desde), FinDeDiaUtc(hasta), 200);
@@ -329,9 +329,9 @@ namespace EventosIAPeru.Core.Core.Services
         }
 
         // Genera un CSV (se abre en Excel) con el log de auditoría
-        public async Task<(ResultadoOperacion Resultado, byte[]? Archivo)> ExportarAuditoria(string firebaseUid)
+        public async Task<(ResultadoOperacion Resultado, byte[]? Archivo)> ExportarAuditoria(string emailUsuario)
         {
-            var (admin, error) = await ObtenerAdmin(firebaseUid);
+            var (admin, error) = await ObtenerAdmin(emailUsuario);
             if (error != null) return (error, null);
 
             var registros = await _moderacionRepository.GetAuditoria(null, null, 5000);
@@ -361,18 +361,18 @@ namespace EventosIAPeru.Core.Core.Services
 
         // ---------------------------- Reglas ----------------------------
 
-        public async Task<(ResultadoOperacion Resultado, List<ReglaModeracionDTO>? Reglas)> GetReglas(string firebaseUid)
+        public async Task<(ResultadoOperacion Resultado, List<ReglaModeracionDTO>? Reglas)> GetReglas(string emailUsuario)
         {
-            var (admin, error) = await ObtenerAdmin(firebaseUid);
+            var (admin, error) = await ObtenerAdmin(emailUsuario);
             if (error != null) return (error, null);
 
             var reglas = await _moderacionRepository.GetReglas();
             return (ResultadoOperacion.Ok(admin!.UsuarioId), reglas.Select(MapearRegla).ToList());
         }
 
-        public async Task<ResultadoOperacion> CrearRegla(string firebaseUid, CrearReglaDTO dto)
+        public async Task<ResultadoOperacion> CrearRegla(string emailUsuario, CrearReglaDTO dto)
         {
-            var (admin, error) = await ObtenerAdmin(firebaseUid);
+            var (admin, error) = await ObtenerAdmin(emailUsuario);
             if (error != null) return error;
 
             var nombre = dto.Nombre.Trim();
@@ -428,9 +428,9 @@ namespace EventosIAPeru.Core.Core.Services
             return ResultadoOperacion.Ok(regla.ReglaId);
         }
 
-        public async Task<ResultadoOperacion> CambiarEstadoRegla(string firebaseUid, int reglaId, bool activa)
+        public async Task<ResultadoOperacion> CambiarEstadoRegla(string emailUsuario, int reglaId, bool activa)
         {
-            var (admin, error) = await ObtenerAdmin(firebaseUid);
+            var (admin, error) = await ObtenerAdmin(emailUsuario);
             if (error != null) return error;
 
             var regla = await _moderacionRepository.GetReglaParaEditar(reglaId);
@@ -451,9 +451,9 @@ namespace EventosIAPeru.Core.Core.Services
         // ---------------------------- Ayudantes ----------------------------
 
         // Revisa que el usuario exista, esté activo y tenga el rol ADMINISTRADOR
-        private async Task<(Usuario? Admin, ResultadoOperacion? Error)> ObtenerAdmin(string firebaseUid)
+        private async Task<(Usuario? Admin, ResultadoOperacion? Error)> ObtenerAdmin(string emailUsuario)
         {
-            var usuario = await _usuarioRepository.GetUsuarioByFirebaseUid(firebaseUid);
+            var usuario = await _usuarioRepository.GetUsuarioByEmail(emailUsuario);
             if (usuario == null)
                 return (null, ResultadoOperacion.NoAutorizado("Tu usuario no está registrado."));
             if (usuario.Estado != "ACTIVO")

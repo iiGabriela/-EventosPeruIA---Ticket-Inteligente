@@ -21,10 +21,10 @@ namespace EventosIAPeru.Core.Core.Services
             _usuarioRepository = usuarioRepository;
         }
 
-        public async Task<ResultadoOperacion> CrearResena(string firebaseUid, CrearResenaDTO dto)
+        public async Task<ResultadoOperacion> CrearResena(string emailUsuario, CrearResenaDTO dto)
         {
             // Debe ser un usuario registrado y activo
-            var usuario = await _usuarioRepository.GetUsuarioByFirebaseUid(firebaseUid);
+            var usuario = await _usuarioRepository.GetUsuarioByEmail(emailUsuario);
             if (usuario == null) return ResultadoOperacion.NoAutorizado("Tu usuario no está registrado.");
             if (usuario.Estado != "ACTIVO") return ResultadoOperacion.NoAutorizado("Tu cuenta no está activa.");
 
@@ -81,18 +81,18 @@ namespace EventosIAPeru.Core.Core.Services
             };
         }
 
-        public async Task<IEnumerable<ResenaDTO>?> GetMisResenas(string firebaseUid)
+        public async Task<IEnumerable<ResenaDTO>?> GetMisResenas(string emailUsuario)
         {
-            var usuario = await _usuarioRepository.GetUsuarioByFirebaseUid(firebaseUid);
+            var usuario = await _usuarioRepository.GetUsuarioByEmail(emailUsuario);
             if (usuario == null) return null;
 
             var resenas = await _resenaRepository.GetResenasDeUsuario(usuario.UsuarioId);
             return resenas.Select(Mapear).ToList();
         }
 
-        public async Task<PendientesResenaDTO?> GetPendientes(string firebaseUid)
+        public async Task<PendientesResenaDTO?> GetPendientes(string emailUsuario)
         {
-            var usuario = await _usuarioRepository.GetUsuarioByFirebaseUid(firebaseUid);
+            var usuario = await _usuarioRepository.GetUsuarioByEmail(emailUsuario);
             if (usuario == null) return null;
 
             var eventos = await _resenaRepository.GetEventosPendientes(usuario.UsuarioId);

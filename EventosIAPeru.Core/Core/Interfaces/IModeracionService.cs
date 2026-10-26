@@ -10,30 +10,30 @@ namespace EventosIAPeru.Core.Core.Interfaces
     public interface IModeracionService
     {
         // Panel con indicadores globales
-        Task<(ResultadoOperacion Resultado, PanelModeracionDTO? Panel)> GetPanel(string firebaseUid);
+        Task<(ResultadoOperacion Resultado, PanelModeracionDTO? Panel)> GetPanel(string emailUsuario);
 
         // Eventos
-        Task<(ResultadoOperacion Resultado, ModeracionEventosDTO? Pagina)> BuscarEventos(string firebaseUid, string? estadoModeracion, string? texto, int pagina);
-        Task<(ResultadoOperacion Resultado, DetalleEventoModeracionDTO? Detalle)> GetDetalleEvento(string firebaseUid, int eventoId);
-        Task<ResultadoOperacion> ModerarEvento(string firebaseUid, int eventoId, ModerarEventoDTO dto);
+        Task<(ResultadoOperacion Resultado, ModeracionEventosDTO? Pagina)> BuscarEventos(string emailUsuario, string? estadoModeracion, string? texto, int pagina);
+        Task<(ResultadoOperacion Resultado, DetalleEventoModeracionDTO? Detalle)> GetDetalleEvento(string emailUsuario, int eventoId);
+        Task<ResultadoOperacion> ModerarEvento(string emailUsuario, int eventoId, ModerarEventoDTO dto);
 
         // Reportes
-        Task<ResultadoOperacion> ReportarEvento(string firebaseUid, int eventoId, CrearReporteDTO dto);
-        Task<(ResultadoOperacion Resultado, List<ReporteDTO>? Reportes)> GetReportes(string firebaseUid, string? estado);
-        Task<ResultadoOperacion> ResolverReporte(string firebaseUid, int reporteId, ResolverReporteDTO dto);
+        Task<ResultadoOperacion> ReportarEvento(string emailUsuario, int eventoId, CrearReporteDTO dto);
+        Task<(ResultadoOperacion Resultado, List<ReporteDTO>? Reportes)> GetReportes(string emailUsuario, string? estado);
+        Task<ResultadoOperacion> ResolverReporte(string emailUsuario, int reporteId, ResolverReporteDTO dto);
 
         // Usuarios
-        Task<(ResultadoOperacion Resultado, List<UsuarioDTO>? Usuarios)> BuscarUsuarios(string firebaseUid, string? texto, string? estado);
-        Task<ResultadoOperacion> CambiarEstadoUsuario(string firebaseUid, int usuarioId, CambiarEstadoUsuarioDTO dto);
-        Task<ResultadoOperacion> VerificarUsuario(string firebaseUid, int usuarioId);
+        Task<(ResultadoOperacion Resultado, List<UsuarioDTO>? Usuarios)> BuscarUsuarios(string emailUsuario, string? texto, string? estado);
+        Task<ResultadoOperacion> CambiarEstadoUsuario(string emailUsuario, int usuarioId, CambiarEstadoUsuarioDTO dto);
+        Task<ResultadoOperacion> VerificarUsuario(string emailUsuario, int usuarioId);
 
         // Auditoría
-        Task<(ResultadoOperacion Resultado, List<AuditoriaDTO>? Registros)> GetAuditoria(string firebaseUid, DateTime? desde, DateTime? hasta);
-        Task<(ResultadoOperacion Resultado, byte[]? Archivo)> ExportarAuditoria(string firebaseUid);
+        Task<(ResultadoOperacion Resultado, List<AuditoriaDTO>? Registros)> GetAuditoria(string emailUsuario, DateTime? desde, DateTime? hasta);
+        Task<(ResultadoOperacion Resultado, byte[]? Archivo)> ExportarAuditoria(string emailUsuario);
 
         // Reglas automáticas
-        Task<(ResultadoOperacion Resultado, List<ReglaModeracionDTO>? Reglas)> GetReglas(string firebaseUid);
-        Task<ResultadoOperacion> CrearRegla(string firebaseUid, CrearReglaDTO dto);
-        Task<ResultadoOperacion> CambiarEstadoRegla(string firebaseUid, int reglaId, bool activa);
+        Task<(ResultadoOperacion Resultado, List<ReglaModeracionDTO>? Reglas)> GetReglas(string emailUsuario);
+        Task<ResultadoOperacion> CrearRegla(string emailUsuario, CrearReglaDTO dto);
+        Task<ResultadoOperacion> CambiarEstadoRegla(string emailUsuario, int reglaId, bool activa);
     }
 }
