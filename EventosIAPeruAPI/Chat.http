@@ -1,0 +1,17 @@
+@host = http://localhost:5295
+
+@adminUid = reemplazar-por-uid-de-administrador
+@uid = uid-prueba-gabriela
+
+### Actualizar un lote pendiente (el worker también actualiza cada 30 segundos)
+POST {{host}}/api/Chat/reindexar
+X-Firebase-Uid: {{adminUid}}
+
+### Pregunta sobre los eventos indexados
+POST {{host}}/api/Chat/chat
+X-Firebase-Uid: {{uid}}
+Content-Type: application/json
+
+{
+  "message": "¿Qué eventos hay próximamente y cuántos cupos tienen?"
+}

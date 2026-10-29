@@ -115,6 +115,7 @@ namespace EventosIAPeru.Core.Infrastructure.Repositories
                                    .ToListAsync();
         }
 
+        /// <summary>US-10: reemplaza las categorías de interés del usuario para calcular recomendaciones.</summary>
         public async Task<bool> ActualizarIntereses(int usuarioId, IReadOnlyCollection<CategoriaEvento> categorias)
         {
             var usuario = await _dbContext.Usuario
@@ -123,8 +124,11 @@ namespace EventosIAPeru.Core.Infrastructure.Repositories
             if (usuario == null)
                 return false;
 
+            // Reutilizamos las categorías rastreadas por EF para evitar duplicados al conservar intereses anteriores.
+            var ids = categorias.Select(c => c.CategoriaId).ToList();
+            var seleccion = await _dbContext.CategoriaEvento.Where(c => ids.Contains(c.CategoriaId)).ToListAsync();
             usuario.Categoria.Clear();
-            foreach (var categoria in categorias)
+            foreach (var categoria in seleccion)
                 usuario.Categoria.Add(categoria);
 
             await _dbContext.SaveChangesAsync();

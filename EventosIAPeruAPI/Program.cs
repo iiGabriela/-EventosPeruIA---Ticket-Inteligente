@@ -7,6 +7,11 @@ using EventosIAPeru.Core.Core.Services;
 using EventosIAPeru.Core.Infrastructure.Data;
 using EventosIAPeru.Core.Infrastructure.Repositories;
 using EventosIAPeru.API.Background;
+using Microsoft.Extensions.AI;
+using OpenAI;
+using OpenAI.Chat;
+using System.ClientModel;
+using EventosIAPeru.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -68,6 +73,26 @@ builder.Services.AddScoped<IEntradaService, EntradaService>();
 builder.Services.AddScoped<IQrService, QrService>();
 
 builder.Services.AddControllers();
+
+// Chatbot con recuperación de eventos (US-16): proveedor y modelo configurados en la sección AI.
+var chatProvider = builder.Configuration["AI:Provider"] ?? "Ollama";
+if (chatProvider is not ("Ollama" or "Gemini")) throw new InvalidOperationException("AI:Provider debe ser Ollama o Gemini.");
+var prefix = $"AI:{chatProvider}:";
+// Ollama funciona localmente; Gemini requiere su modelo y API key configurados.
+var chatEndpoint = builder.Configuration[prefix + "Endpoint"]
+    ?? (chatProvider == "Ollama" ? "http://localhost:11434/v1/" : "https://generativelanguage.googleapis.com/v1beta/openai/");
+var chatModel = builder.Configuration[prefix + "ChatModel"]
+    ?? (chatProvider == "Ollama" ? "muse-glimmer:latest" : throw new InvalidOperationException("Configura AI:Gemini:ChatModel."));
+var chatApiKey = builder.Configuration[prefix + "ApiKey"]
+    ?? (chatProvider == "Ollama" ? "ollama" : throw new InvalidOperationException("Configura AI:Gemini:ApiKey."));
+var chatClient = new ChatClient(chatModel, new ApiKeyCredential(chatApiKey), new OpenAIClientOptions { Endpoint = new Uri(chatEndpoint) });
+// El controller usa IChatClient: cambiar de proveedor no modifica el flujo de recuperación.
+builder.Services.AddSingleton<IChatClient>(chatClient.AsIChatClient());
+// Los embeddings se generan con Ollama y se guardan en PostgreSQL/pgvector.
+builder.Services.AddHttpClient("embeddings", client => client.Timeout = TimeSpan.FromSeconds(60));
+builder.Services.AddScoped<EventoRagIndex>();
+// Mantiene el índice actualizado por lotes al iniciar y cada 30 segundos.
+builder.Services.AddHostedService<EventoRagWorker>();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
