@@ -19,6 +19,8 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <!-- US-16: IChatClient con proveedores compatibles con la API de OpenAI (Ollama o Gemini). -->
+    <PackageReference Include="Microsoft.Extensions.AI.OpenAI" Version="10.3.0" />
   </ItemGroup>
 
   <ItemGroup>

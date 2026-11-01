@@ -16,10 +16,13 @@ namespace EventosIAPeru.Core.Core.Services
         private const string RolAdministrador = "ADMINISTRADOR";
 
         private readonly IUsuarioRepository _usuarioRepository;
+        private readonly ICategoriaRepository _categoriaRepository;
 
-        public UsuarioService(IUsuarioRepository usuarioRepository)
+        public UsuarioService(IUsuarioRepository usuarioRepository,
+                              ICategoriaRepository categoriaRepository)
         {
             _usuarioRepository = usuarioRepository;
+            _categoriaRepository = categoriaRepository;
         }
 
         // ---------------------------- US-01 ----------------------------
@@ -110,6 +113,33 @@ namespace EventosIAPeru.Core.Core.Services
             return (ResultadoOperacion.Ok(usuario.UsuarioId), cambio);
         }
 
+        public async Task<(ResultadoOperacion Resultado, List<CategoriaDTO>? Intereses)> ObtenerIntereses(string firebaseUid)
+        {
+            var (usuario, error) = await ObtenerUsuarioActivo(firebaseUid);
+            if (error != null)
+                return (error, null);
+
+            var intereses = await _usuarioRepository.GetIntereses(usuario!.UsuarioId);
+            return (ResultadoOperacion.Ok(usuario.UsuarioId), intereses.Select(MapearCategoria).ToList());
+        }
+
+        public async Task<ResultadoOperacion> ActualizarIntereses(string firebaseUid, ActualizarInteresesDTO dto)
+        {
+            var (usuario, error) = await ObtenerUsuarioActivo(firebaseUid);
+            if (error != null)
+                return error;
+
+            var ids = dto.CategoriaIds.Distinct().ToList();
+            var categorias = await _categoriaRepository.GetCategoriasByIds(ids);
+            if (categorias.Count != ids.Count)
+                return ResultadoOperacion.Invalido("Una o más categorías no existen.");
+
+            var actualizado = await _usuarioRepository.ActualizarIntereses(usuario!.UsuarioId, categorias);
+            return actualizado
+                ? ResultadoOperacion.Ok(usuario.UsuarioId)
+                : ResultadoOperacion.Invalido("No se pudieron actualizar tus intereses.");
+        }
+
         // ---------------------------- Ayudantes ----------------------------
 
         // Busca al usuario y revisa que exista y esté ACTIVO (un bloqueado no puede usar la cuenta)
@@ -137,6 +167,16 @@ namespace EventosIAPeru.Core.Core.Services
                 Verificado = u.Verificado,
                 FechaRegistro = u.FechaRegistro,
                 Roles = u.Rol.Select(r => r.Nombre).OrderBy(n => n).ToList()
+            };
+        }
+
+        private static CategoriaDTO MapearCategoria(CategoriaEvento categoria)
+        {
+            return new CategoriaDTO
+            {
+                CategoriaId = categoria.CategoriaId,
+                Nombre = categoria.Nombre,
+                TotalConsultas = categoria.TotalConsultas
             };
         }
 

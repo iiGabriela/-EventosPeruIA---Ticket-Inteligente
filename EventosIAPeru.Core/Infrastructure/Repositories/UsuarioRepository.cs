@@ -104,5 +104,35 @@ namespace EventosIAPeru.Core.Infrastructure.Repositories
                             .Usuario
                             .AnyAsync(u => u.UsuarioId == usuarioId && u.Rol.Any(r => r.Nombre == nombreRol));
         }
+
+        public async Task<List<CategoriaEvento>> GetIntereses(int usuarioId)
+        {
+            return await _dbContext.Usuario
+                                   .AsNoTracking()
+                                   .Where(u => u.UsuarioId == usuarioId)
+                                   .SelectMany(u => u.Categoria)
+                                   .OrderBy(c => c.Nombre)
+                                   .ToListAsync();
+        }
+
+        /// <summary>US-10: reemplaza las categorías de interés del usuario para calcular recomendaciones.</summary>
+        public async Task<bool> ActualizarIntereses(int usuarioId, IReadOnlyCollection<CategoriaEvento> categorias)
+        {
+            var usuario = await _dbContext.Usuario
+                                           .Include(u => u.Categoria)
+                                           .FirstOrDefaultAsync(u => u.UsuarioId == usuarioId);
+            if (usuario == null)
+                return false;
+
+            // Reutilizamos las categorías rastreadas por EF para evitar duplicados al conservar intereses anteriores.
+            var ids = categorias.Select(c => c.CategoriaId).ToList();
+            var seleccion = await _dbContext.CategoriaEvento.Where(c => ids.Contains(c.CategoriaId)).ToListAsync();
+            usuario.Categoria.Clear();
+            foreach (var categoria in seleccion)
+                usuario.Categoria.Add(categoria);
+
+            await _dbContext.SaveChangesAsync();
+            return true;
+        }
     }
 }
