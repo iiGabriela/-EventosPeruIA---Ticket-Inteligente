@@ -17,5 +17,9 @@ namespace EventosIAPeru.Core.Core.Interfaces
 
         // US-03: valida que el usuario tenga el rol y devuelve el mensaje para el toast
         Task<(ResultadoOperacion Resultado, CambioRolDTO? Cambio)> CambiarRolActivo(string emailUsuario, string rol);
+
+        // US-10: categorías de interés del usuario (señal para las recomendaciones)
+        Task<(ResultadoOperacion Resultado, List<CategoriaDTO>? Intereses)> ObtenerIntereses(string emailUsuario);
+        Task<ResultadoOperacion> ActualizarIntereses(string emailUsuario, ActualizarInteresesDTO dto);
     }
 }

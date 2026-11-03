@@ -42,7 +42,7 @@ public class VentaYUsuarioServiceTests
         usuarioRepo.Setup(r => r.ExisteEmail(It.IsAny<string>())).ReturnsAsync(false);
         usuarioRepo.Setup(r => r.ExisteDni("12345678")).ReturnsAsync(true);
 
-        var servicio = new UsuarioService(usuarioRepo.Object);
+        var servicio = new UsuarioService(usuarioRepo.Object, new Mock<ICategoriaRepository>().Object);
         var resultado = await servicio.Registrar("nuevo@test.com", new RegistroUsuarioDTO { Nombre = "Nuevo", Dni = "12345678" });
 
         Assert.Equal(TipoResultado.Invalido, resultado.Tipo);
@@ -58,7 +58,7 @@ public class VentaYUsuarioServiceTests
                    .Callback<Usuario, string>((u, _) => creado = u)
                    .ReturnsAsync(true);
 
-        var servicio = new UsuarioService(usuarioRepo.Object);
+        var servicio = new UsuarioService(usuarioRepo.Object, new Mock<ICategoriaRepository>().Object);
         var resultado = await servicio.Registrar("  Nuevo@Test.com ", new RegistroUsuarioDTO { Nombre = "Nuevo", Dni = "87654321" });
 
         Assert.True(resultado.Exito);

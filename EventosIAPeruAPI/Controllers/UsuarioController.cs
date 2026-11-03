@@ -81,5 +81,29 @@ namespace EventosIAPeru.API.Controllers
 
             return Ok(cambio);
         }
+
+        /// <summary>Obtiene las categorías de interés del usuario.</summary>
+        [HttpGet("me/intereses")]
+        public async Task<IActionResult> GetMisIntereses()
+        {
+            var emailUsuario = ObtenerEmailUsuario();
+            if (emailUsuario == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
+
+            var (result, intereses) = await _usuarioService.ObtenerIntereses(emailUsuario);
+            if (!result.Exito) return Responder(result);
+
+            return Ok(intereses);
+        }
+
+        /// <summary>Reemplaza las categorías de interés usadas por US-10.</summary>
+        [HttpPut("me/intereses")]
+        public async Task<IActionResult> ActualizarMisIntereses([FromBody] ActualizarInteresesDTO dto)
+        {
+            var emailUsuario = ObtenerEmailUsuario();
+            if (emailUsuario == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
+
+            var result = await _usuarioService.ActualizarIntereses(emailUsuario, dto);
+            return Responder(result);
+        }
     }
 }
