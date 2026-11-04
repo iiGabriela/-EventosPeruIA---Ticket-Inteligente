@@ -1,41 +1,41 @@
 @host = https://localhost:7224
-@uid = uid-prueba-gabriela
+@email = gabriela@test.com
 
 ### 1) US-01 Registro (crea el usuario como ASISTENTE)
 POST {{host}}/api/usuario/registro
 Content-Type: application/json
-X-Firebase-Uid: {{uid}}
+X-User-Email: {{email}}
 
 {
   "nombre": "Gabriela Marin",
-  "email": "gabriela@test.com"
+  "dni": "10000003"
 }
 
-### 2) US-01 Probar correo repetido (debe dar 400 con otro uid)
+### 2) US-01 Registrarse otra vez con el mismo correo (debe dar 400)
 POST {{host}}/api/usuario/registro
 Content-Type: application/json
-X-Firebase-Uid: uid-otro
+X-User-Email: {{email}}
 
 {
   "nombre": "Otra Persona",
-  "email": "gabriela@test.com"
+  "dni": "10000004"
 }
 
 ### 3) US-02 Ver mi perfil (200 si estoy registrada y activa)
 GET {{host}}/api/usuario/me
-X-Firebase-Uid: {{uid}}
+X-User-Email: {{email}}
 
 ### 4) US-02 Sin sesión (debe dar 401)
 GET {{host}}/api/usuario/me
 
 ### 5) US-03 Activar rol ORGANIZADOR en la misma cuenta
 POST {{host}}/api/usuario/me/rol-organizador
-X-Firebase-Uid: {{uid}}
+X-User-Email: {{email}}
 
 ### 6) US-03 Cambiar de rol activo (devuelve el mensaje del toast)
 POST {{host}}/api/usuario/me/cambiar-rol
 Content-Type: application/json
-X-Firebase-Uid: {{uid}}
+X-User-Email: {{email}}
 
 {
   "rol": "ORGANIZADOR"
@@ -44,7 +44,7 @@ X-Firebase-Uid: {{uid}}
 ### 7) US-03 Pedir ser ADMINISTRADOR sin tenerlo (debe dar 403)
 POST {{host}}/api/usuario/me/cambiar-rol
 Content-Type: application/json
-X-Firebase-Uid: {{uid}}
+X-User-Email: {{email}}
 
 {
   "rol": "ADMINISTRADOR"

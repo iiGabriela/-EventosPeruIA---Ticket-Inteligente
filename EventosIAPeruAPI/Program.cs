@@ -4,14 +4,18 @@ using Microsoft.IdentityModel.Tokens;
 using Pgvector.EntityFrameworkCore;
 using EventosIAPeru.Core.Core.Interfaces;
 using EventosIAPeru.Core.Core.Services;
+using EventosIAPeru.Core.Core.Settings;
 using EventosIAPeru.Core.Infrastructure.Data;
 using EventosIAPeru.Core.Infrastructure.Repositories;
 using EventosIAPeru.API.Background;
+using EventosIAPeru.API.Middleware;
+using EventosIAPeru.API.OpenApi;
 using Microsoft.Extensions.AI;
 using OpenAI;
 using OpenAI.Chat;
 using System.ClientModel;
 using EventosIAPeru.API.Services;
+using EventosIAPeru.API.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -70,7 +74,27 @@ builder.Services.AddScoped<ICompraRepository, CompraRepository>();
 builder.Services.AddScoped<ICompraService, CompraService>();
 builder.Services.AddScoped<IEntradaRepository, EntradaRepository>();
 builder.Services.AddScoped<IEntradaService, EntradaService>();
-builder.Services.AddScoped<IQrService, QrService>();
+// US-07: QR dinámico firmado (appsettings -> Qr:ClaveFirma, Qr:SegundosValidez)
+var qrSettings = builder.Configuration.GetSection("Qr").Get<QrSettings>() ?? new QrSettings();
+builder.Services.AddSingleton<IQrService>(new QrService(qrSettings));
+
+// US-09: cupos en tiempo real (SignalR en /hubs/aforo)
+builder.Services.AddSignalR();
+builder.Services.AddSingleton<INotificadorAforo, NotificadorAforoSignalR>();
+
+// Frontend Vue + Quasar: orígenes permitidos en appsettings.json -> Cors:Origenes
+var origenesFrontend = builder.Configuration.GetSection("Cors:Origenes").Get<string[]>() ?? Array.Empty<string>();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("Frontend", policy =>
+        policy.WithOrigins(origenesFrontend)
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              // SignalR (US-09) necesita credenciales cuando el frontend está en otro origen
+              .AllowCredentials()
+              // Para que el navegador pueda leer el nombre del archivo exportado (US-12)
+              .WithExposedHeaders("Content-Disposition"));
+});
 
 builder.Services.AddControllers();
 
@@ -82,7 +106,7 @@ var prefix = $"AI:{chatProvider}:";
 var chatEndpoint = builder.Configuration[prefix + "Endpoint"]
     ?? (chatProvider == "Ollama" ? "http://localhost:11434/v1/" : "https://generativelanguage.googleapis.com/v1beta/openai/");
 var chatModel = builder.Configuration[prefix + "ChatModel"]
-    ?? (chatProvider == "Ollama" ? "muse-glimmer:latest" : throw new InvalidOperationException("Configura AI:Gemini:ChatModel."));
+    ?? (chatProvider == "Ollama" ? "qwen2.5:7b" : throw new InvalidOperationException("Configura AI:Gemini:ChatModel."));
 var chatApiKey = builder.Configuration[prefix + "ApiKey"]
     ?? (chatProvider == "Ollama" ? "ollama" : throw new InvalidOperationException("Configura AI:Gemini:ApiKey."));
 var chatClient = new ChatClient(chatModel, new ApiKeyCredential(chatApiKey), new OpenAIClientOptions { Endpoint = new Uri(chatEndpoint) });
@@ -93,23 +117,35 @@ builder.Services.AddHttpClient("embeddings", client => client.Timeout = TimeSpan
 builder.Services.AddScoped<EventoRagIndex>();
 // Mantiene el índice actualizado por lotes al iniciar y cada 30 segundos.
 builder.Services.AddHostedService<EventoRagWorker>();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+
+// Documentación OpenAPI (incluye los comentarios /// de los controllers) + esquemas de seguridad
+builder.Services.AddOpenApi(options => options.AddDocumentTransformer<SeguridadOpenApiTransformer>());
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Middleware propio: errores no controlados -> JSON { mensaje } sin trazas internas
+app.UseMiddleware<ManejoErroresMiddleware>();
+
+// Swagger UI en /swagger (solo Development)
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/openapi/v1.json", "EventosPeruIA API v1");
+        options.DocumentTitle = "EventosPeruIA API";
+    });
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("Frontend");
 
 // Primero se identifica quién es (token) y luego se revisan permisos
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<AforoHub>("/hubs/aforo");
 
 app.Run();

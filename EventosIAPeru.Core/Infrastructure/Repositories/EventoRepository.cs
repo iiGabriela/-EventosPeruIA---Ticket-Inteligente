@@ -28,6 +28,7 @@ namespace EventosIAPeru.Core.Infrastructure.Repositories
                             .Evento
                             .AsNoTracking()
                             .Include(e => e.Categoria)
+                            .Include(e => e.Organizador)
                             .Where(e => e.Estado == "PUBLICADO"
                                      && e.EstadoModeracion != "DESACTIVADO"
                                      && e.FechaFin > ahora);
@@ -177,6 +178,17 @@ namespace EventosIAPeru.Core.Infrastructure.Repositories
                 return rows > 0;
             }
             return false;
+        }
+
+        /// <summary>
+        /// Los embeddings guardan el texto viejo del evento: al editarlo o cancelarlo se borran
+        /// para que el asistente RAG no responda con datos desactualizados hasta reindexarlo.
+        /// </summary>
+        public async Task EliminarEmbeddings(int eventoId)
+        {
+            await _dbContext.EventoEmbedding
+                            .Where(e => e.EventoId == eventoId)
+                            .ExecuteDeleteAsync();
         }
     }
 }

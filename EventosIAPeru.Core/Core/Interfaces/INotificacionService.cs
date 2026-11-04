@@ -6,9 +6,9 @@ namespace EventosIAPeru.Core.Core.Interfaces;
 
 public interface INotificacionService
 {
-    Task<List<NotificacionDTO>?> ObtenerMisNotificaciones(string firebaseUid);
-    Task<ResultadoOperacion> MarcarComoLeida(string firebaseUid, int notificacionId);
-    Task<ResultadoOperacion> MarcarTodasComoLeidas(string firebaseUid);
+    Task<List<NotificacionDTO>?> ObtenerMisNotificaciones(string emailUsuario);
+    Task<ResultadoOperacion> MarcarComoLeida(string emailUsuario, int notificacionId);
+    Task<ResultadoOperacion> MarcarTodasComoLeidas(string emailUsuario);
     Task GenerarRecordatoriosProximos(int? usuarioId = null);
     Task NotificarCambioEvento(Evento eventoAnterior, Evento eventoActualizado);
     Task NotificarCancelacionEvento(Evento evento);

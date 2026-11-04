@@ -1,15 +1,15 @@
 @host = http://localhost:5295
 
-@adminUid = reemplazar-por-uid-de-administrador
-@uid = uid-prueba-gabriela
+@adminEmail = reemplazar-por-correo-de-administrador@test.com
+@email = gabriela@test.com
 
 ### Actualizar un lote pendiente (el worker también actualiza cada 30 segundos)
 POST {{host}}/api/Chat/reindexar
-X-Firebase-Uid: {{adminUid}}
+X-User-Email: {{adminEmail}}
 
 ### Pregunta sobre los eventos indexados
 POST {{host}}/api/Chat/chat
-X-Firebase-Uid: {{uid}}
+X-User-Email: {{email}}
 Content-Type: application/json
 
 {

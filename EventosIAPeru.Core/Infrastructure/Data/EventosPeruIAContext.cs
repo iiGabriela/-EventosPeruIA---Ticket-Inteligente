@@ -523,9 +523,10 @@ public partial class EventosPeruIAContext : DbContext
 
             entity.ToTable("usuario");
 
-            entity.HasIndex(e => e.FirebaseUid, "usuario_firebase_uid_key").IsUnique();
-
             entity.Property(e => e.UsuarioId).HasColumnName("usuario_id");
+            entity.Property(e => e.Dni)
+                .HasMaxLength(8)
+                .HasColumnName("dni");
             entity.Property(e => e.Email)
                 .HasMaxLength(254)
                 .HasColumnName("email");
@@ -536,9 +537,6 @@ public partial class EventosPeruIAContext : DbContext
             entity.Property(e => e.FechaRegistro)
                 .HasDefaultValueSql("now()")
                 .HasColumnName("fecha_registro");
-            entity.Property(e => e.FirebaseUid)
-                .HasMaxLength(128)
-                .HasColumnName("firebase_uid");
             entity.Property(e => e.Nombre)
                 .HasMaxLength(80)
                 .HasColumnName("nombre");

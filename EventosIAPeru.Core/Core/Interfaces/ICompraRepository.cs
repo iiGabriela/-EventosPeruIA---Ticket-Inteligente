@@ -9,5 +9,6 @@ public interface ICompraRepository
     Task<Compra?> GetCompraPorCodigoOperacion(int usuarioId, Guid codigoOperacion);
     Task<Compra?> GetCompraPorId(int compraId);
     Task<List<Compra>> GetComprasDeUsuario(int usuarioId);
-    Task<int> CrearCompraConEntradas(Compra compra);
+    // Devuelve null si al confirmar ya no quedan cupos suficientes
+    Task<int?> CrearCompraConEntradas(Compra compra, int aforoTotal);
 }

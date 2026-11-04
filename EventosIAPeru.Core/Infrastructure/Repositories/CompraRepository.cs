@@ -58,9 +58,24 @@ public class CompraRepository : ICompraRepository
                                .ToListAsync();
     }
 
-    public async Task<int> CrearCompraConEntradas(Compra compra)
+    /// <summary>
+    /// US-09: bloquea la fila del evento (SELECT ... FOR UPDATE) y vuelve a contar los cupos
+    /// dentro de la transacción. Si dos personas compran el último cupo a la vez, la segunda
+    /// espera al bloqueo, ve el aforo lleno y no se confirma. Devuelve null si no hay cupos.
+    /// </summary>
+    public async Task<int?> CrearCompraConEntradas(Compra compra, int aforoTotal)
     {
-        using var transaccion = await _dbContext.Database.BeginTransactionAsync();
+        await using var transaccion = await _dbContext.Database.BeginTransactionAsync();
+
+        await _dbContext.Database.ExecuteSqlInterpolatedAsync(
+            $"SELECT 1 FROM evento WHERE evento_id = {compra.EventoId} FOR UPDATE");
+
+        var vendidas = await GetEntradasVendidas(compra.EventoId);
+        if (vendidas + compra.Cantidad > aforoTotal)
+        {
+            await transaccion.RollbackAsync();
+            return null;
+        }
 
         await _dbContext.Compra.AddAsync(compra);
         await _dbContext.SaveChangesAsync();

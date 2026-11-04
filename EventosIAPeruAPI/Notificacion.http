@@ -1,15 +1,15 @@
 @host = https://localhost:7000
-@firebaseUid = reemplazar-con-firebase-uid
+@email = reemplazar-con-tu-correo@test.com
 @notificacionId = 1
 
 ### US-14: listar mis notificaciones
 GET {{host}}/api/Notificacion
-X-Firebase-Uid: {{firebaseUid}}
+X-User-Email: {{email}}
 
 ### US-14: marcar una notificación como leída
 PUT {{host}}/api/Notificacion/{{notificacionId}}/leer
-X-Firebase-Uid: {{firebaseUid}}
+X-User-Email: {{email}}
 
 ### US-14: marcar todas las notificaciones como leídas
 PUT {{host}}/api/Notificacion/leer-todas
-X-Firebase-Uid: {{firebaseUid}}
+X-User-Email: {{email}}

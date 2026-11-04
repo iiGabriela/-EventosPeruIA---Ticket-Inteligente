@@ -14,16 +14,19 @@ namespace EventosIAPeru.Core.Core.Services
         private readonly ICategoriaRepository _categoriaRepository;
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly INotificacionService _notificacionService;
+        private readonly INotificadorAforo _notificadorAforo;
 
         public EventoService(IEventoRepository eventoRepository,
                              ICategoriaRepository categoriaRepository,
                              IUsuarioRepository usuarioRepository,
-                             INotificacionService notificacionService)
+                             INotificacionService notificacionService,
+                             INotificadorAforo notificadorAforo)
         {
             _eventoRepository = eventoRepository;
             _categoriaRepository = categoriaRepository;
             _usuarioRepository = usuarioRepository;
             _notificacionService = notificacionService;
+            _notificadorAforo = notificadorAforo;
         }
 
         // ---------------------------- US-05 ----------------------------
@@ -44,7 +47,7 @@ namespace EventosIAPeru.Core.Core.Services
             return (eventosDTO, total);
         }
 
-        public async Task<EventoDTO?> GetEventoById(int id, string? firebaseUid)
+        public async Task<EventoDTO?> GetEventoById(int id, string? emailUsuario)
         {
             var evento = await _eventoRepository.GetEventoById(id);
             if (evento == null) return null;
@@ -52,9 +55,9 @@ namespace EventosIAPeru.Core.Core.Services
             // Un borrador, cancelado o desactivado solo lo ve su organizador
             if (!EsVisibleAlPublico(evento))
             {
-                if (string.IsNullOrWhiteSpace(firebaseUid)) return null;
+                if (string.IsNullOrWhiteSpace(emailUsuario)) return null;
 
-                var usuario = await _usuarioRepository.GetUsuarioByFirebaseUid(firebaseUid);
+                var usuario = await _usuarioRepository.GetUsuarioByEmail(emailUsuario);
                 if (usuario == null || usuario.UsuarioId != evento.OrganizadorId) return null;
             }
 
@@ -64,18 +67,18 @@ namespace EventosIAPeru.Core.Core.Services
 
         // ---------------------------- US-04 ----------------------------
 
-        public async Task<IEnumerable<EventoDTO>?> GetMisEventos(string firebaseUid)
+        public async Task<IEnumerable<EventoDTO>?> GetMisEventos(string emailUsuario)
         {
-            var usuario = await _usuarioRepository.GetUsuarioByFirebaseUid(firebaseUid);
+            var usuario = await _usuarioRepository.GetUsuarioByEmail(emailUsuario);
             if (usuario == null) return null;
 
             var eventos = await _eventoRepository.GetEventosByOrganizador(usuario.UsuarioId);
             return await MapearEventos(eventos);
         }
 
-        public async Task<ResultadoOperacion> CrearEvento(string firebaseUid, CrearEventoDTO eventoDTO)
+        public async Task<ResultadoOperacion> CrearEvento(string emailUsuario, CrearEventoDTO eventoDTO)
         {
-            var usuario = await _usuarioRepository.GetUsuarioByFirebaseUid(firebaseUid);
+            var usuario = await _usuarioRepository.GetUsuarioByEmail(emailUsuario);
             if (usuario == null) return ResultadoOperacion.NoAutorizado("Tu usuario no está registrado.");
             if (usuario.Estado != "ACTIVO") return ResultadoOperacion.NoAutorizado("Tu cuenta no está activa.");
 
@@ -109,9 +112,9 @@ namespace EventosIAPeru.Core.Core.Services
             return ResultadoOperacion.Ok(evento.EventoId);
         }
 
-        public async Task<ResultadoOperacion> ActualizarEvento(string firebaseUid, ActualizarEventoDTO eventoDTO)
+        public async Task<ResultadoOperacion> ActualizarEvento(string emailUsuario, ActualizarEventoDTO eventoDTO)
         {
-            var (evento, error) = await ObtenerEventoPropio(firebaseUid, eventoDTO.EventoId);
+            var (evento, error) = await ObtenerEventoPropio(emailUsuario, eventoDTO.EventoId);
             if (error != null) return error;
 
             if (evento!.Estado == "CANCELADO")
@@ -142,14 +145,19 @@ namespace EventosIAPeru.Core.Core.Services
             var actualizado = await _eventoRepository.UpdateEvento(eventoActualizado);
             if (!actualizado) return ResultadoOperacion.Invalido("No se pudo actualizar el evento.");
 
+            await _eventoRepository.EliminarEmbeddings(evento.EventoId);
             await _notificacionService.NotificarCambioEvento(evento, eventoActualizado);
+
+            // US-09: si cambió el aforo, los cupos visibles cambian en tiempo real
+            if (eventoActualizado.AforoTotal != evento.AforoTotal)
+                await _notificadorAforo.CuposActualizados(evento.EventoId, eventoActualizado.AforoTotal, entradasVendidas);
 
             return ResultadoOperacion.Ok(evento.EventoId);
         }
 
-        public async Task<ResultadoOperacion> PublicarEvento(string firebaseUid, int id)
+        public async Task<ResultadoOperacion> PublicarEvento(string emailUsuario, int id)
         {
-            var (evento, error) = await ObtenerEventoPropio(firebaseUid, id);
+            var (evento, error) = await ObtenerEventoPropio(emailUsuario, id);
             if (error != null) return error;
 
             if (evento!.Estado != "BORRADOR")
@@ -165,9 +173,9 @@ namespace EventosIAPeru.Core.Core.Services
             return ResultadoOperacion.Ok(id);
         }
 
-        public async Task<ResultadoOperacion> CancelarEvento(string firebaseUid, int id)
+        public async Task<ResultadoOperacion> CancelarEvento(string emailUsuario, int id)
         {
-            var (evento, error) = await ObtenerEventoPropio(firebaseUid, id);
+            var (evento, error) = await ObtenerEventoPropio(emailUsuario, id);
             if (error != null) return error;
 
             if (evento!.Estado == "CANCELADO")
@@ -178,6 +186,7 @@ namespace EventosIAPeru.Core.Core.Services
             var actualizado = await _eventoRepository.UpdateEstado(id, "CANCELADO");
             if (!actualizado) return ResultadoOperacion.Invalido("No se pudo cancelar el evento.");
 
+            await _eventoRepository.EliminarEmbeddings(id);
             await _notificacionService.NotificarCancelacionEvento(evento);
 
             return ResultadoOperacion.Ok(id);
@@ -186,9 +195,9 @@ namespace EventosIAPeru.Core.Core.Services
         // ---------------------------- Ayudantes ----------------------------
 
         /// <summary>El organizador solo puede modificar sus propios eventos (US-03 / US-04).</summary>
-        private async Task<(Evento? Evento, ResultadoOperacion? Error)> ObtenerEventoPropio(string firebaseUid, int eventoId)
+        private async Task<(Evento? Evento, ResultadoOperacion? Error)> ObtenerEventoPropio(string emailUsuario, int eventoId)
         {
-            var usuario = await _usuarioRepository.GetUsuarioByFirebaseUid(firebaseUid);
+            var usuario = await _usuarioRepository.GetUsuarioByEmail(emailUsuario);
             if (usuario == null)
                 return (null, ResultadoOperacion.NoAutorizado("Tu usuario no está registrado."));
             if (usuario.Estado != "ACTIVO")

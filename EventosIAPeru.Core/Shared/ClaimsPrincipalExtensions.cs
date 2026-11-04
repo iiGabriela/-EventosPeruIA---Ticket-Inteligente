@@ -4,12 +4,15 @@ namespace EventosIAPeru.Core.Shared
 {
     public static class ClaimsPrincipalExtensions
     {
-        /// <summary>El token de Firebase trae el UID en "user_id" y en "sub".</summary>
-        public static string? ObtenerFirebaseUid(this ClaimsPrincipal usuario)
+        /// <summary>
+        /// Firebase solo valida el login; en nuestra base identificamos al usuario por su correo.
+        /// El token trae el correo en "email" (ASP.NET puede mapearlo a ClaimTypes.Email).
+        /// </summary>
+        public static string? ObtenerEmail(this ClaimsPrincipal usuario)
         {
-            return usuario.FindFirst("user_id")?.Value
-                ?? usuario.FindFirst("sub")?.Value
-                ?? usuario.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var email = usuario.FindFirst("email")?.Value
+                ?? usuario.FindFirst(ClaimTypes.Email)?.Value;
+            return string.IsNullOrWhiteSpace(email) ? null : email.Trim().ToLowerInvariant();
         }
     }
 }

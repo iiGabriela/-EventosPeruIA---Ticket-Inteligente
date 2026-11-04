@@ -10,7 +10,7 @@ En `appsettings.Development.json`, `AI:Provider` selecciona el proveedor. Cada p
 
 ## Indexación y vigencia
 
-Un worker actualiza al iniciar y cada 30 segundos, en lotes de hasta 20 eventos pendientes. Solo indexa eventos publicados, no desactivados y no finalizados. Cambios nuevos pueden tardar varios ciclos si hay muchos eventos pendientes. `POST /api/Chat/reindexar` procesa un lote manualmente y exige un administrador activo; en Development admite X-Firebase-Uid como el resto de la aplicación.
+Un worker actualiza al iniciar y cada 30 segundos, en lotes de hasta 20 eventos pendientes. Solo indexa eventos publicados, no desactivados y no finalizados. Cambios nuevos pueden tardar varios ciclos si hay muchos eventos pendientes. `POST /api/Chat/reindexar` procesa un lote manualmente y exige un administrador activo; en Development admite X-User-Email como el resto de la aplicación.
 
 Se usa un bloqueo transaccional de PostgreSQL para coordinar procesos e instancias y un upsert para reemplazar el fragmento sin duplicados. Se registra el instante anterior a leer los eventos: si se edita un evento durante la generación, su versión del índice queda obsoleta y se excluye de las búsquedas hasta reindexarla. Las escrituras de eventos deben actualizar `FechaActualizacion`, como hacen los repositorios actuales. Escrituras directas a BD deben respetar esta regla.
 
@@ -18,7 +18,7 @@ El identificador del índice incluye una versión interna y el modelo para inval
 
 ## Recuperación y contexto
 
-`POST /api/Chat/chat` exige sesión y una cuenta registrada ACTIVA. Sin sesión devuelve 401; un UID desconocido o cuenta bloqueada devuelve 403. En Development admite `X-Firebase-Uid`; fuera de Development exige identidad autenticada mediante el token Firebase validado por el middleware. El chat recupera únicamente información pública de eventos; no recupera datos personales, compras individuales ni historiales de usuarios. No acepta un usuario destino para consultar datos privados.
+`POST /api/Chat/chat` exige sesión y una cuenta registrada ACTIVA. Sin sesión devuelve 401; un correo no registrado o cuenta bloqueada devuelve 403. En Development admite `X-User-Email`; fuera de Development exige identidad autenticada mediante el token Firebase validado por el middleware. El chat recupera únicamente información pública de eventos; no recupera datos personales, compras individuales ni historiales de usuarios. No acepta un usuario destino para consultar datos privados.
 
 `POST /api/Chat/chat` recibe `{ "message": "..." }`. Filtra en PostgreSQL por publicación, moderación, vigencia, modelo y actualidad del índice. pgvector calcula la distancia coseno; se seleccionan únicamente fuentes que superen el umbral y dentro de TopK. Si no hay fuentes relevantes actualizadas, no se invoca al LLM.
 
@@ -40,3 +40,11 @@ Fallos HTTP, timeout y respuestas inválidas del proveedor producen HTTP 503 sin
 - Incluir “ignora las reglas” en la pregunta/descripción: verificar el comportamiento con el modelo elegido.
 
 Para Nomic se utilizan los prefijos `search_document:` al indexar y `search_query:` al consultar, como indica [la ficha del modelo](https://huggingface.co/nomic-ai/nomic-embed-text-v1.5). La versión v3 invalida los índices anteriores sin prefijos. El umbral 0.6 se calibró con un evento temporal y seis preguntas básicas, y debe evaluarse con el catálogo real.
+
+## Fechas, respaldos y precios
+
+- El contexto que recibe el modelo trae las fechas ya convertidas a **hora de Perú** (`inicio`, `fin`) y el campo `hoyEnPeru`, para que pueda interpretar "hoy", "mañana" o "este fin de semana". La respuesta HTTP mantiene las fechas en UTC para el frontend.
+- **Respaldo por fecha:** los embeddings no entienden expresiones de tiempo. Si la pregunta menciona una fecha cercana y la búsqueda semántica no supera el umbral, se recuperan los eventos indexados de los próximos 7 días.
+- **Respaldo por precio:** "gratis" no se parece semánticamente a "precio 0". Si la pregunta menciona eventos gratuitos, se agregan los eventos indexados con precio 0.
+- El campo `retrieval` de la respuesta indica cuándo se usó un respaldo, para que la fuente siga siendo trazable (US-17).
+- El modelo de chat por defecto es `qwen2.5:7b` (≈4,7 GB; cabe en una GPU de 8 GB). Modelos más pequeños responden más rápido pero redactan peor.

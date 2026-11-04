@@ -8,14 +8,17 @@ namespace EventosIAPeru.Core.Core.Interfaces
     /// </summary>
     public interface IUsuarioRepository
     {
-        
-        Task<Usuario?> GetUsuarioByFirebaseUid(string firebaseUid);
+        // Busca al usuario logueado por su correo (el que viene en el token de Firebase)
+        Task<Usuario?> GetUsuarioByEmail(string email);
 
         // Igual que el anterior pero trae también sus roles
-        Task<Usuario?> GetUsuarioConRoles(string firebaseUid);
+        Task<Usuario?> GetUsuarioConRoles(string email);
 
         // ¿Ya existe un usuario con ese correo?
         Task<bool> ExisteEmail(string email);
+
+        // ¿Ya existe un usuario con ese DNI?
+        Task<bool> ExisteDni(string dni);
 
         // Guarda el usuario nuevo con un rol inicial (ej: ASISTENTE)
         Task<bool> CrearUsuario(Usuario usuario, string nombreRol);

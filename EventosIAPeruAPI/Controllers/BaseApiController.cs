@@ -5,7 +5,7 @@ namespace EventosIAPeru.API.Controllers
 {
     /// <summary>
     /// Controller base: junta lo que se repite en los controllers de Gabriela
-    /// (leer el UID de Firebase y convertir el resultado en respuesta HTTP).
+    /// (leer el correo del usuario logueado y convertir el resultado en respuesta HTTP).
     /// </summary>
     public abstract class BaseApiController : ControllerBase
     {
@@ -17,17 +17,17 @@ namespace EventosIAPeru.API.Controllers
         }
 
         /// <summary>
-        /// UID del usuario autenticado (token de Firebase).
-        /// Solo en Development se acepta el header "X-Firebase-Uid" para probar sin Firebase.
+        /// Correo del usuario autenticado (viene en el token de Firebase).
+        /// Solo en Development se acepta el header "X-User-Email" para probar sin token.
         /// </summary>
-        protected string? ObtenerFirebaseUid()
+        protected string? ObtenerEmailUsuario()
         {
-            var firebaseUid = User.ObtenerFirebaseUid();
-            if (string.IsNullOrWhiteSpace(firebaseUid) && _environment.IsDevelopment())
+            var email = User.ObtenerEmail();
+            if (email == null && _environment.IsDevelopment())
             {
-                firebaseUid = Request.Headers["X-Firebase-Uid"].FirstOrDefault();
+                email = Request.Headers["X-User-Email"].FirstOrDefault();
             }
-            return string.IsNullOrWhiteSpace(firebaseUid) ? null : firebaseUid;
+            return string.IsNullOrWhiteSpace(email) ? null : email.Trim().ToLowerInvariant();
         }
 
         // Convierte el ResultadoOperacion en el código HTTP que corresponde

@@ -1,22 +1,22 @@
 @host = http://localhost:5295
-# UID de Firebase de un usuario que exista en la tabla "usuario".
-# Solo funciona en Development, hasta que se configure Firebase (US-02).
-@uid = uid-prueba-hugo
+# Correo de un usuario que exista en la tabla "usuario" (Firebase solo valida el login).
+# El header X-User-Email solo funciona en Development; en producción va el token de Firebase.
+@email = hugo.prueba@correo.com
 
 ### ===================== Antes de probar (endpoints de Gabriela) =====================
 # 1) Registrarse (crea el usuario como ASISTENTE)
 POST {{host}}/api/Usuario/registro
 Content-Type: application/json
-X-Firebase-Uid: {{uid}}
+X-User-Email: {{email}}
 
 {
   "nombre": "Hugo Flores",
-  "email": "hugo@test.com"
+  "dni": "10000001"
 }
 
 ### 2) Activar el rol ORGANIZADOR (necesario para crear eventos)
 POST {{host}}/api/Usuario/me/rol-organizador
-X-Firebase-Uid: {{uid}}
+X-User-Email: {{email}}
 
 ### ===================== US-05: Categorías =====================
 GET {{host}}/api/Categoria
@@ -36,12 +36,12 @@ Accept: application/json
 
 ### ===================== US-04: Mis eventos =====================
 GET {{host}}/api/Evento/mis-eventos
-X-Firebase-Uid: {{uid}}
+X-User-Email: {{email}}
 
 ### Crear evento (queda en BORRADOR)
 POST {{host}}/api/Evento
 Content-Type: application/json
-X-Firebase-Uid: {{uid}}
+X-User-Email: {{email}}
 
 {
   "categoriaId": 1,
@@ -62,7 +62,7 @@ X-Firebase-Uid: {{uid}}
 ### Editar evento
 PUT {{host}}/api/Evento/1
 Content-Type: application/json
-X-Firebase-Uid: {{uid}}
+X-User-Email: {{email}}
 
 {
   "eventoId": 1,
@@ -83,21 +83,52 @@ X-Firebase-Uid: {{uid}}
 
 ### Publicar evento
 PUT {{host}}/api/Evento/1/publicar
-X-Firebase-Uid: {{uid}}
+X-User-Email: {{email}}
 
 ### Cancelar evento
 PUT {{host}}/api/Evento/1/cancelar
-X-Firebase-Uid: {{uid}}
+X-User-Email: {{email}}
 
 ### ===================== US-11: Panel de ventas =====================
 # periodo: TODO | MES | SEMANA  (o fechaDesde / fechaHasta)
 GET {{host}}/api/Venta/panel?periodo=TODO
-X-Firebase-Uid: {{uid}}
+X-User-Email: {{email}}
 
 ### ===================== US-12: Exportar =====================
 GET {{host}}/api/Venta/exportar/excel?periodo=MES
-X-Firebase-Uid: {{uid}}
+X-User-Email: {{email}}
 
 ###
 GET {{host}}/api/Venta/exportar/pdf?fechaDesde=2026-10-01&fechaHasta=2026-10-31
-X-Firebase-Uid: {{uid}}
+X-User-Email: {{email}}
+
+### ===================== US-07 / US-08: QR dinámico y check-in =====================
+# 1) Mis entradas (pase completo, sin el código secreto)
+GET {{host}}/api/Entrada/mis-entradas
+X-User-Email: {{email}}
+
+### 2) QR dinámico de una entrada (vence en 24 s; el frontend lo pide de nuevo antes)
+@entradaId = 1
+GET {{host}}/api/Entrada/{{entradaId}}/qr
+X-User-Email: {{email}}
+
+### 3) Check-in escaneando el QR (pegar el "token" del paso 2; lo hace el organizador)
+POST {{host}}/api/Entrada/validar
+Content-Type: application/json
+X-User-Email: {{email}}
+
+{
+  "eventoId": 1,
+  "codigoQr": "pegar-token-aqui"
+}
+
+### 4) Check-in manual: ID de la entrada + DNI del titular
+POST {{host}}/api/Entrada/validar
+Content-Type: application/json
+X-User-Email: {{email}}
+
+{
+  "eventoId": 1,
+  "entradaId": {{entradaId}},
+  "titularDocumento": "12345678"
+}

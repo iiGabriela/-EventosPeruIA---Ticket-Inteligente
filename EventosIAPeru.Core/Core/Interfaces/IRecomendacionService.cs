@@ -6,6 +6,6 @@ namespace EventosIAPeru.Core.Core.Interfaces;
 public interface IRecomendacionService
 {
     Task<(ResultadoOperacion Resultado, RecomendacionesDTO? Recomendaciones)> ObtenerRecomendaciones(
-        string firebaseUid,
+        string emailUsuario,
         int cantidad);
 }

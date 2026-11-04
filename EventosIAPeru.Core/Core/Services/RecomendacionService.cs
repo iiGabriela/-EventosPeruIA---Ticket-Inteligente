@@ -27,7 +27,7 @@ public class RecomendacionService : IRecomendacionService
     }
 
     public async Task<(ResultadoOperacion Resultado, RecomendacionesDTO? Recomendaciones)> ObtenerRecomendaciones(
-        string firebaseUid,
+        string emailUsuario,
         int cantidad)
     {
         if (cantidad <= 0)
@@ -36,7 +36,7 @@ public class RecomendacionService : IRecomendacionService
         if (cantidad > CantidadMaxima)
             return (ResultadoOperacion.Invalido($"La cantidad máxima de recomendaciones es {CantidadMaxima}."), null);
 
-        var usuario = await _usuarioRepository.GetUsuarioByFirebaseUid(firebaseUid);
+        var usuario = await _usuarioRepository.GetUsuarioByEmail(emailUsuario);
         if (usuario == null)
             return (ResultadoOperacion.NoEncontrado("Tu usuario no está registrado. Completa tu registro."), null);
 

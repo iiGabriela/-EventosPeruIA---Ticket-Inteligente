@@ -5,7 +5,7 @@ namespace EventosIAPeru.Core.Core.Interfaces
     public interface IVentaService
     {
         /// <summary>Null si el usuario no está registrado.</summary>
-        Task<PanelVentasDTO?> GetPanelVentas(string firebaseUid, FiltroVentasDTO filtro);
+        Task<PanelVentasDTO?> GetPanelVentas(string emailUsuario, FiltroVentasDTO filtro);
 
         /// <summary>Genera el Excel con los mismos datos del panel.</summary>
         byte[] GenerarExcel(PanelVentasDTO panel);
