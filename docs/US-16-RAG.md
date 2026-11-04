@@ -40,3 +40,11 @@ Fallos HTTP, timeout y respuestas inválidas del proveedor producen HTTP 503 sin
 - Incluir “ignora las reglas” en la pregunta/descripción: verificar el comportamiento con el modelo elegido.
 
 Para Nomic se utilizan los prefijos `search_document:` al indexar y `search_query:` al consultar, como indica [la ficha del modelo](https://huggingface.co/nomic-ai/nomic-embed-text-v1.5). La versión v3 invalida los índices anteriores sin prefijos. El umbral 0.6 se calibró con un evento temporal y seis preguntas básicas, y debe evaluarse con el catálogo real.
+
+## Fechas, respaldos y precios
+
+- El contexto que recibe el modelo trae las fechas ya convertidas a **hora de Perú** (`inicio`, `fin`) y el campo `hoyEnPeru`, para que pueda interpretar "hoy", "mañana" o "este fin de semana". La respuesta HTTP mantiene las fechas en UTC para el frontend.
+- **Respaldo por fecha:** los embeddings no entienden expresiones de tiempo. Si la pregunta menciona una fecha cercana y la búsqueda semántica no supera el umbral, se recuperan los eventos indexados de los próximos 7 días.
+- **Respaldo por precio:** "gratis" no se parece semánticamente a "precio 0". Si la pregunta menciona eventos gratuitos, se agregan los eventos indexados con precio 0.
+- El campo `retrieval` de la respuesta indica cuándo se usó un respaldo, para que la fuente siga siendo trazable (US-17).
+- El modelo de chat por defecto es `qwen2.5:7b` (≈4,7 GB; cabe en una GPU de 8 GB). Modelos más pequeños responden más rápido pero redactan peor.

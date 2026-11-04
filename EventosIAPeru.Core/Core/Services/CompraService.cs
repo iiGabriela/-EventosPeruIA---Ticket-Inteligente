@@ -10,12 +10,15 @@ public class CompraService : ICompraService
     private readonly ICompraRepository _compraRepository;
     private readonly IUsuarioRepository _usuarioRepository;
     private readonly IQrService _qrService;
+    private readonly INotificadorAforo _notificadorAforo;
 
-    public CompraService(ICompraRepository compraRepository, IUsuarioRepository usuarioRepository, IQrService qrService)
+    public CompraService(ICompraRepository compraRepository, IUsuarioRepository usuarioRepository, IQrService qrService,
+                         INotificadorAforo notificadorAforo)
     {
         _compraRepository = compraRepository;
         _usuarioRepository = usuarioRepository;
         _qrService = qrService;
+        _notificadorAforo = notificadorAforo;
     }
 
     public async Task<ResultadoOperacion> CrearCompra(string emailUsuario, CrearCompraDTO dto)
@@ -89,6 +92,10 @@ public class CompraService : ICompraService
         var compraId = await _compraRepository.CrearCompraConEntradas(compra, evento.AforoTotal);
         if (compraId == null)
             return ResultadoOperacion.Invalido("No hay suficientes entradas disponibles.");
+
+        // US-09: la cartelera de los demás usuarios se actualiza sin recargar
+        var vendidasAhora = await _compraRepository.GetEntradasVendidas(dto.EventoId);
+        await _notificadorAforo.CuposActualizados(dto.EventoId, evento.AforoTotal, vendidasAhora);
 
         return ResultadoOperacion.Ok(compraId);
     }

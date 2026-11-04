@@ -14,16 +14,19 @@ namespace EventosIAPeru.Core.Core.Services
         private readonly ICategoriaRepository _categoriaRepository;
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly INotificacionService _notificacionService;
+        private readonly INotificadorAforo _notificadorAforo;
 
         public EventoService(IEventoRepository eventoRepository,
                              ICategoriaRepository categoriaRepository,
                              IUsuarioRepository usuarioRepository,
-                             INotificacionService notificacionService)
+                             INotificacionService notificacionService,
+                             INotificadorAforo notificadorAforo)
         {
             _eventoRepository = eventoRepository;
             _categoriaRepository = categoriaRepository;
             _usuarioRepository = usuarioRepository;
             _notificacionService = notificacionService;
+            _notificadorAforo = notificadorAforo;
         }
 
         // ---------------------------- US-05 ----------------------------
@@ -144,6 +147,10 @@ namespace EventosIAPeru.Core.Core.Services
 
             await _eventoRepository.EliminarEmbeddings(evento.EventoId);
             await _notificacionService.NotificarCambioEvento(evento, eventoActualizado);
+
+            // US-09: si cambió el aforo, los cupos visibles cambian en tiempo real
+            if (eventoActualizado.AforoTotal != evento.AforoTotal)
+                await _notificadorAforo.CuposActualizados(evento.EventoId, eventoActualizado.AforoTotal, entradasVendidas);
 
             return ResultadoOperacion.Ok(evento.EventoId);
         }

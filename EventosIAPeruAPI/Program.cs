@@ -15,6 +15,7 @@ using OpenAI;
 using OpenAI.Chat;
 using System.ClientModel;
 using EventosIAPeru.API.Services;
+using EventosIAPeru.API.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -77,6 +78,10 @@ builder.Services.AddScoped<IEntradaService, EntradaService>();
 var qrSettings = builder.Configuration.GetSection("Qr").Get<QrSettings>() ?? new QrSettings();
 builder.Services.AddSingleton<IQrService>(new QrService(qrSettings));
 
+// US-09: cupos en tiempo real (SignalR en /hubs/aforo)
+builder.Services.AddSignalR();
+builder.Services.AddSingleton<INotificadorAforo, NotificadorAforoSignalR>();
+
 // Frontend Vue + Quasar: orígenes permitidos en appsettings.json -> Cors:Origenes
 var origenesFrontend = builder.Configuration.GetSection("Cors:Origenes").Get<string[]>() ?? Array.Empty<string>();
 builder.Services.AddCors(options =>
@@ -85,6 +90,8 @@ builder.Services.AddCors(options =>
         policy.WithOrigins(origenesFrontend)
               .AllowAnyHeader()
               .AllowAnyMethod()
+              // SignalR (US-09) necesita credenciales cuando el frontend está en otro origen
+              .AllowCredentials()
               // Para que el navegador pueda leer el nombre del archivo exportado (US-12)
               .WithExposedHeaders("Content-Disposition"));
 });
@@ -99,7 +106,7 @@ var prefix = $"AI:{chatProvider}:";
 var chatEndpoint = builder.Configuration[prefix + "Endpoint"]
     ?? (chatProvider == "Ollama" ? "http://localhost:11434/v1/" : "https://generativelanguage.googleapis.com/v1beta/openai/");
 var chatModel = builder.Configuration[prefix + "ChatModel"]
-    ?? (chatProvider == "Ollama" ? "muse-glimmer:latest" : throw new InvalidOperationException("Configura AI:Gemini:ChatModel."));
+    ?? (chatProvider == "Ollama" ? "qwen2.5:7b" : throw new InvalidOperationException("Configura AI:Gemini:ChatModel."));
 var chatApiKey = builder.Configuration[prefix + "ApiKey"]
     ?? (chatProvider == "Ollama" ? "ollama" : throw new InvalidOperationException("Configura AI:Gemini:ApiKey."));
 var chatClient = new ChatClient(chatModel, new ApiKeyCredential(chatApiKey), new OpenAIClientOptions { Endpoint = new Uri(chatEndpoint) });
@@ -139,5 +146,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<AforoHub>("/hubs/aforo");
 
 app.Run();

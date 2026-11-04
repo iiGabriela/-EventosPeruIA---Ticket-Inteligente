@@ -15,6 +15,7 @@ public class CompraServiceTests
     private readonly Mock<ICompraRepository> _compraRepo = new();
     private readonly Mock<IUsuarioRepository> _usuarioRepo = new();
     private readonly Mock<IQrService> _qr = new();
+    private readonly Mock<INotificadorAforo> _aforo = new();
     private readonly CompraService _servicio;
 
     public CompraServiceTests()
@@ -25,7 +26,7 @@ public class CompraServiceTests
                    .ReturnsAsync(new Evento { EventoId = 7, Estado = "PUBLICADO", EstadoModeracion = "CONFORME", AforoTotal = 10, Precio = 25, FechaInicio = DateTime.UtcNow.AddDays(5) });
         _qr.Setup(q => q.GenerarCodigoQr()).Returns(() => Guid.NewGuid().ToString("N"));
 
-        _servicio = new CompraService(_compraRepo.Object, _usuarioRepo.Object, _qr.Object);
+        _servicio = new CompraService(_compraRepo.Object, _usuarioRepo.Object, _qr.Object, _aforo.Object);
     }
 
     private static CrearCompraDTO Compra(int cantidad) => new()
@@ -84,6 +85,21 @@ public class CompraServiceTests
         Assert.Equal("YAPE", guardada.MetodoPago);
         Assert.Equal(25, guardada.PrecioUnitario);
         Assert.Equal(3, guardada.Entrada.Select(e => e.CodigoQr).Distinct().Count());
+    }
+
+    [Fact]
+    public async Task CompraConfirmada_AvisaCuposEnTiempoReal_YRechazadaNo()
+    {
+        _compraRepo.SetupSequence(r => r.CrearCompraConEntradas(It.IsAny<Compra>(), 10))
+                   .ReturnsAsync(42)
+                   .ReturnsAsync((int?)null);
+        _compraRepo.Setup(r => r.GetEntradasVendidas(7)).ReturnsAsync(9);
+
+        await _servicio.CrearCompra(Email, Compra(1));
+        await _servicio.CrearCompra(Email, Compra(1));
+
+        // Solo la compra que se confirmó dispara el aviso (aforo 10, vendidas 9 -> queda 1 cupo)
+        _aforo.Verify(a => a.CuposActualizados(7, 10, 9), Times.Once);
     }
 
     [Fact]

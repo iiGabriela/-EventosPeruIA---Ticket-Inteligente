@@ -16,6 +16,7 @@ public class EventoServiceTests
     private readonly Mock<ICategoriaRepository> _categoriaRepo = new();
     private readonly Mock<IUsuarioRepository> _usuarioRepo = new();
     private readonly Mock<INotificacionService> _notificaciones = new();
+    private readonly Mock<INotificadorAforo> _aforo = new();
     private readonly EventoService _servicio;
 
     public EventoServiceTests()
@@ -25,7 +26,7 @@ public class EventoServiceTests
         _usuarioRepo.Setup(r => r.TieneRol(10, "ORGANIZADOR")).ReturnsAsync(true);
         _categoriaRepo.Setup(r => r.GetCategoriaById(1)).ReturnsAsync(new CategoriaEvento { CategoriaId = 1 });
 
-        _servicio = new EventoService(_eventoRepo.Object, _categoriaRepo.Object, _usuarioRepo.Object, _notificaciones.Object);
+        _servicio = new EventoService(_eventoRepo.Object, _categoriaRepo.Object, _usuarioRepo.Object, _notificaciones.Object, _aforo.Object);
     }
 
     private static ActualizarEventoDTO EventoValido(int eventoId = 0, int aforo = 100) => new()
