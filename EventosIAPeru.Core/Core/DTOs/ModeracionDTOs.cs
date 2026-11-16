@@ -67,6 +67,10 @@ namespace EventosIAPeru.Core.Core.DTOs
         [StringLength(500, ErrorMessage = "El motivo no puede superar los 500 caracteres.")]
         public string? Motivo { get; set; }
 
+        // Resultado de revisar la documentación del organizador (null = no se cambia)
+        public bool? ValidacionSunat { get; set; }
+        public bool? ValidacionMunicipal { get; set; }
+
         // El frontend lo manda en true después de que el admin confirma en el diálogo
         public bool Confirmado { get; set; }
     }

@@ -19,6 +19,8 @@ namespace EventosIAPeru.Core.Core.Interfaces
         Task<bool> ExisteEvento(int eventoId);
         Task<bool> ExisteReportePendiente(int usuarioId, int eventoId);
         void AgregarReporte(ReporteEvento reporte);
+        // ¿La regla automática ya dejó un reporte sin resolver para este evento?
+        Task<bool> ExisteReportePendienteDeRegla(int eventoId, int reglaId);
 
         // ---------- Usuarios ----------
         Task<List<Usuario>> BuscarUsuarios(string? texto, string? estado, int max);

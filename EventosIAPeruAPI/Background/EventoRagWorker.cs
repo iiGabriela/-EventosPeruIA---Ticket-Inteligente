@@ -10,6 +10,17 @@ public sealed class EventoRagWorker(IServiceScopeFactory scopes, ILogger<EventoR
 {
     protected override async Task ExecuteAsync(CancellationToken ct)
     {
+        // Sin API key la API igual arranca: solo el asistente queda apagado hasta configurarla.
+        await using (var scope = scopes.CreateAsyncScope())
+        {
+            if (!scope.ServiceProvider.GetRequiredService<EventoRagIndex>().Configurado)
+            {
+                logger.LogWarning("Asistente de IA desactivado: falta AI:Gemini:ApiKey. " +
+                    "Configúrala con: dotnet user-secrets set \"AI:Gemini:ApiKey\" \"<tu clave>\" --project EventosIAPeruAPI");
+                return;
+            }
+        }
+
         using var timer = new PeriodicTimer(TimeSpan.FromSeconds(30));
         // La primera revisión es inmediata; las siguientes esperan el intervalo del temporizador.
         do

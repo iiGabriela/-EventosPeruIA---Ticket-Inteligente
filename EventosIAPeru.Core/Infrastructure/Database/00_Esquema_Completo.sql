@@ -522,6 +522,7 @@ CREATE TABLE public.usuario (
     verificado boolean DEFAULT false NOT NULL,
     fecha_registro timestamp with time zone DEFAULT now() NOT NULL,
     dni character varying(8),
+    firebase_uid character varying(128),
     CONSTRAINT usuario_dni_formato_check CHECK (((dni IS NULL) OR ((dni)::text ~ '^[0-9]{8}$'::text))),
     CONSTRAINT usuario_estado_check CHECK (((estado)::text = ANY (ARRAY[('ACTIVO'::character varying)::text, ('BLOQUEADO'::character varying)::text, ('INACTIVO'::character varying)::text])))
 );
@@ -1058,4 +1059,20 @@ ALTER TABLE ONLY public.usuario_rol
 -- PostgreSQL database dump complete
 --
 
+--
+-- Seguridad (US-02): la cuenta se identifica por el UID de Firebase
+--
 
+CREATE UNIQUE INDEX uq_usuario_firebase_uid ON public.usuario USING btree (firebase_uid) WHERE (firebase_uid IS NOT NULL);
+
+--
+-- Índices para consultas frecuentes (panel del organizador, reseñas, chat y reglas automáticas)
+--
+
+CREATE INDEX ix_evento_organizador ON public.evento USING btree (organizador_id);
+CREATE INDEX ix_resena_evento ON public.resena_evento USING btree (evento_id);
+CREATE INDEX ix_mensaje_chat_conversacion ON public.mensaje_chat USING btree (conversacion_id, fecha);
+CREATE INDEX ix_conversacion_chat_usuario ON public.conversacion_chat USING btree (usuario_id, fecha_inicio DESC);
+CREATE INDEX ix_reporte_evento_regla ON public.reporte_evento USING btree (evento_id, regla_id) WHERE (regla_id IS NOT NULL);
+
+ALTER FUNCTION public.fn_ventas_por_evento(integer, timestamp with time zone, timestamp with time zone) SET search_path = public;

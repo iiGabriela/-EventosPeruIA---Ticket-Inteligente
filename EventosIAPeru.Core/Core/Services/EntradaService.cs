@@ -1,4 +1,4 @@
-﻿using EventosIAPeru.Core.Core.DTOs;
+using EventosIAPeru.Core.Core.DTOs;
 using EventosIAPeru.Core.Core.Entities;
 using EventosIAPeru.Core.Core.Interfaces;
 using EventosIAPeru.Core.Shared;
@@ -22,7 +22,7 @@ public class EntradaService : IEntradaService
     public async Task<List<EntradaDTO>?> GetMisEntradas(string emailUsuario)
     {
         var usuario = await _usuarioRepository.GetUsuarioByEmail(emailUsuario);
-        if (usuario == null) return null;
+        if (usuario == null || usuario.Estado != "ACTIVO") return null;
 
         var entradas = await _entradaRepository.GetEntradasDeUsuario(usuario.UsuarioId);
         return entradas.Select(MapearEntrada).ToList();
@@ -35,6 +35,8 @@ public class EntradaService : IEntradaService
         var usuario = await _usuarioRepository.GetUsuarioByEmail(emailUsuario);
         if (usuario == null)
             return (ResultadoOperacion.NoAutorizado("Tu usuario no está registrado."), null);
+        if (usuario.Estado != "ACTIVO")
+            return (ResultadoOperacion.NoAutorizado("Tu cuenta no está activa."), null);
 
         var entrada = await _entradaRepository.GetEntradaPorId(entradaId);
         if (entrada == null)
@@ -65,6 +67,8 @@ public class EntradaService : IEntradaService
         var usuario = await _usuarioRepository.GetUsuarioByEmail(emailUsuario);
         if (usuario == null)
             return (null, ResultadoOperacion.NoAutorizado("Tu usuario no está registrado."));
+        if (usuario.Estado != "ACTIVO")
+            return (null, ResultadoOperacion.NoAutorizado("Tu cuenta no está activa."));
 
         var esOrganizador = await _entradaRepository.EsOrganizadorDelEvento(dto.EventoId, usuario.UsuarioId);
         if (!esOrganizador)

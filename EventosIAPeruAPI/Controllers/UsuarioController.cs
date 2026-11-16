@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using EventosIAPeru.Core.Core.DTOs;
 using EventosIAPeru.Core.Core.Interfaces;
 
@@ -25,12 +26,13 @@ namespace EventosIAPeru.API.Controllers
 
         /// <summary>Crea el perfil del usuario nuevo (nombre y correo). Empieza como ASISTENTE.</summary>
         [HttpPost("registro")]
+        [EnableRateLimiting("registro")]
         public async Task<IActionResult> Registrar([FromBody] RegistroUsuarioDTO dto)
         {
             var emailUsuario = ObtenerEmailUsuario();
             if (emailUsuario == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
 
-            var result = await _usuarioService.Registrar(emailUsuario, dto);
+            var result = await _usuarioService.Registrar(emailUsuario, dto, ObtenerFirebaseUid());
             if (!result.Exito) return Responder(result);
 
             // Devolvemos el perfil creado con un mensaje de confirmación

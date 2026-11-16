@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using EventosIAPeru.Core.Core.DTOs;
 using EventosIAPeru.Core.Core.Interfaces;
 
@@ -17,6 +18,7 @@ namespace EventosIAPeru.API.Controllers
         }
 
         [HttpPost]
+        [EnableRateLimiting("compra")]
         public async Task<IActionResult> CrearCompra([FromBody] CrearCompraDTO dto)
         {
             var emailUsuario = ObtenerEmailUsuario();

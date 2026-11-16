@@ -30,6 +30,28 @@ namespace EventosIAPeru.Core.Infrastructure.Repositories
             return usuario;
         }
 
+        public async Task<Usuario?> GetUsuarioByFirebaseUid(string firebaseUid)
+        {
+            return await _dbContext.Usuario.AsNoTracking()
+                            .FirstOrDefaultAsync(u => u.FirebaseUid == firebaseUid);
+        }
+
+        // Solo enlaza si el perfil sigue sin UID: así dos sesiones no pueden reclamar el mismo perfil
+        public async Task<bool> VincularFirebaseUid(int usuarioId, string firebaseUid)
+        {
+            try
+            {
+                var filas = await _dbContext.Usuario
+                    .Where(u => u.UsuarioId == usuarioId && u.FirebaseUid == null)
+                    .ExecuteUpdateAsync(s => s.SetProperty(u => u.FirebaseUid, firebaseUid));
+                return filas == 1;
+            }
+            catch (DbUpdateException)
+            {
+                return false;
+            }
+        }
+
         // Busca al usuario por su correo e incluye sus roles
         public async Task<Usuario?> GetUsuarioConRoles(string email)
         {

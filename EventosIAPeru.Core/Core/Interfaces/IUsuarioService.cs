@@ -7,7 +7,7 @@ namespace EventosIAPeru.Core.Core.Interfaces
     public interface IUsuarioService
     {
         // US-01: crea el perfil del usuario en nuestra base (la cuenta ya existe en Firebase)
-        Task<ResultadoOperacion> Registrar(string emailUsuario, RegistroUsuarioDTO dto);
+        Task<ResultadoOperacion> Registrar(string emailUsuario, RegistroUsuarioDTO dto, string? firebaseUid = null);
 
         // US-02: devuelve el perfil si la cuenta existe y está activa
         Task<(ResultadoOperacion Resultado, UsuarioDTO? Usuario)> ObtenerPerfil(string emailUsuario);

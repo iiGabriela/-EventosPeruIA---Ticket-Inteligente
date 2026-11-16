@@ -39,7 +39,7 @@ namespace EventosIAPeru.Core.Core.Services
             // Debe tener una entrada válida de ese evento
             var tieneEntrada = await _resenaRepository.TieneEntradaValida(usuario.UsuarioId, evento.EventoId);
             if (!tieneEntrada)
-                return ResultadoOperacion.NoAutorizado("Solo puedes reseñar eventos para los que tienes una entrada válida.");
+                return ResultadoOperacion.NoAutorizado("Solo puedes reseñar eventos a los que asististe (entrada validada en el ingreso).");
 
             // Una sola reseña por evento
             var yaReseno = await _resenaRepository.ExisteResena(usuario.UsuarioId, evento.EventoId);

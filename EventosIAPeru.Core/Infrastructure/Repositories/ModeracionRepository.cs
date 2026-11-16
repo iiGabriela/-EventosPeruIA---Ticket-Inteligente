@@ -122,6 +122,12 @@ namespace EventosIAPeru.Core.Infrastructure.Repositories
             _dbContext.ReporteEvento.Add(reporte);
         }
 
+        public async Task<bool> ExisteReportePendienteDeRegla(int eventoId, int reglaId)
+        {
+            return await _dbContext.ReporteEvento
+                            .AnyAsync(r => r.EventoId == eventoId && r.ReglaId == reglaId && r.Estado == "PENDIENTE");
+        }
+
         // ---------------------------- Usuarios ----------------------------
 
         public async Task<List<Usuario>> BuscarUsuarios(string? texto, string? estado, int max)

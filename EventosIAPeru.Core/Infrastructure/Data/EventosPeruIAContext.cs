@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using EventosIAPeru.Core.Core.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -530,6 +530,10 @@ public partial class EventosPeruIAContext : DbContext
             entity.Property(e => e.Email)
                 .HasMaxLength(254)
                 .HasColumnName("email");
+            entity.Property(e => e.FirebaseUid)
+                .HasMaxLength(128)
+                .HasColumnName("firebase_uid");
+            entity.HasIndex(e => e.FirebaseUid, "uq_usuario_firebase_uid").IsUnique();
             entity.Property(e => e.Estado)
                 .HasMaxLength(12)
                 .HasDefaultValueSql("'ACTIVO'::character varying")

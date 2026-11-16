@@ -143,6 +143,9 @@ namespace EventosIAPeru.Core.Core.Services
 
             evento.EstadoModeracion = nuevoEstado;
             evento.MotivoModeracion = string.IsNullOrWhiteSpace(motivo) ? null : motivo;
+            // El admin deja constancia de la documentación que revisó (RUC en SUNAT, licencia municipal)
+            if (dto.ValidacionSunat.HasValue) evento.ValidacionSunat = dto.ValidacionSunat;
+            if (dto.ValidacionMunicipal.HasValue) evento.ValidacionMunicipal = dto.ValidacionMunicipal;
             evento.FechaActualizacion = DateTime.UtcNow;
 
             var auditoria = NuevaAuditoria(admin!.UsuarioId, "EVENTO_" + nuevoEstado, motivo);
