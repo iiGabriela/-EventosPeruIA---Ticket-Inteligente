@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Revisión técnica · Eventia</title>
+<style>
+  :root{
+    --bg:#f6f5f1; --card:#ffffff; --ink:#1c1b18; --muted:#66635b; --line:#e2dfd6;
+    --ok:#1f7a4d; --ok-bg:#e3f3ea; --warn:#9a6200; --warn-bg:#fbefd2; --bad:#b3261e; --bad-bg:#fbe4e1;
+    --info:#22577a; --info-bg:#e1eef6; --accent:#1c1b18; --track:#e7e4da;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#141412; --card:#1e1d1a; --ink:#eeebe3; --muted:#a29e93; --line:#33312c;
+      --ok:#6fd3a0; --ok-bg:#16342a; --warn:#f0c060; --warn-bg:#3a2e12; --bad:#ff8f86; --bad-bg:#431b18;
+      --info:#8cc4e8; --info-bg:#162c3a; --accent:#eeebe3; --track:#2b2925;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  main{max-width:1080px;margin:0 auto;padding:32px 16px 64px}
+  h1{font-size:28px;line-height:1.2;margin:0 0 4px;letter-spacing:-.01em}
+  h2{font-size:19px;margin:40px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+  h3{font-size:15px;margin:20px 0 6px}
+  p{margin:0 0 10px} .muted{color:var(--muted)} small{color:var(--muted)}
+  code{font:12.5px ui-monospace,Consolas,monospace;background:var(--track);padding:1px 5px;border-radius:4px;overflow-wrap:anywhere}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px 20px}
+  .scores{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:20px}
+  .big{font-size:44px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+  .label{font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:8px}
+  .bar{height:12px;background:var(--track);border-radius:99px;overflow:hidden;margin:12px 0 8px}
+  .bar>i{display:block;height:100%;border-radius:99px;background:var(--ok)}
+  .bar.adj>i{background:var(--warn)}
+  .tw{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--card)}
+  table{border-collapse:collapse;width:100%;min-width:820px}
+  th,td{text-align:left;vertical-align:top;padding:9px 12px;border-bottom:1px solid var(--line);font-size:13.5px}
+  th{font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);background:var(--bg)}
+  tr:last-child td{border-bottom:0}
+  td.n{font-variant-numeric:tabular-nums;white-space:nowrap}
+  .pill{display:inline-block;padding:2px 9px;border-radius:99px;font-size:12px;font-weight:600;white-space:nowrap}
+  .ok{background:var(--ok-bg);color:var(--ok)} .warn{background:var(--warn-bg);color:var(--warn)}
+  .bad{background:var(--bad-bg);color:var(--bad)} .info{background:var(--info-bg);color:var(--info)}
+  ul{margin:6px 0 10px;padding-left:20px} li{margin:4px 0}
+  .check{list-style:none;padding-left:0}
+  .check li{padding-left:28px;position:relative;margin:7px 0}
+  .check li::before{content:"";position:absolute;left:2px;top:3px;width:15px;height:15px;border:1.5px solid var(--muted);border-radius:4px}
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+  .note{border-left:3px solid var(--info);background:var(--info-bg);padding:10px 14px;border-radius:0 8px 8px 0;margin:12px 0;font-size:14px}
+</style>
+</head>
+<body>
+<main>
+
+<p class="label">Revisión técnica · actualizada el 15 nov 2026 tras las correcciones · proyecto universitario</p>
+<h1>Eventia / EventosPeruIA – Ticket Inteligente</h1>
+<p class="muted">Backend ASP.NET Core (.NET 10) + PostgreSQL/pgvector (Supabase) · Frontend Vue 3 + Quasar + Vite · Firebase Authentication · Ramas: <code>fix/seguridad-ia-hu</code> (backend) y <code>fix/seguridad-y-arranque</code> (frontend)</p>
+
+<div class="scores">
+  <div class="card">
+    <div class="label">Avance por historias de usuario</div>
+    <div class="big">98%</div>
+    <div class="bar"><i style="width:98%"></i></div>
+    <small>Antes 95%. Promedio de las 17 HU contra los criterios de aceptación del documento del equipo (14 completas, 3 al 90% por falta de prueba con el modelo de IA real).</small>
+  </div>
+  <div class="card">
+    <div class="label">Avance ajustado por seguridad</div>
+    <div class="big">98%</div>
+    <div class="bar"><i style="width:98%"></i></div>
+    <small>Antes 88%. Ya no quedan hallazgos críticos ni altos abiertos, así que no hay descuento.</small>
+  </div>
+</div>
+
+<h2>Resumen ejecutivo</h2>
+<div class="card">
+<ul>
+  <li><b>Fallo crítico cerrado:</b> la API ahora identifica cada cuenta por el UID de Firebase (<code>usuario.firebase_uid</code>). Un perfil sin UID solo se vincula a un correo verificado. Se confirmó que <code>admin@eventia.pe</code> existía en Supabase sin cuenta en Firebase: el riesgo era real.</li>
+  <li><b>Fallo alto cerrado:</b> el atajo <code>X-User-Email</code> está apagado por defecto y solo se activa a propósito en Development.</li>
+  <li><b>Arranque sin configuración:</b> el frontend trae su <code>.env</code>; el backend solo necesita la cadena de conexión en user-secrets. La clave del QR se genera sola en Development.</li>
+  <li><b>IA sin Ollama:</b> chat, embeddings y reglas de moderación funcionan con Gemini y una API key. Sin clave la API arranca igual.</li>
+  <li><b>HU completadas:</b> reglas automáticas de moderación (antes se guardaban pero nunca se evaluaban, ni las simples ni las de IA), memoria de conversación del chat, reseñas solo con check-in, validación SUNAT/municipal.</li>
+  <li><b>Verificado:</b> 38 pruebas del backend y 12 del frontend pasan; la API se probó en ejecución contra Supabase (rutas públicas, 401 sin sesión, roles, exportación) y el frontend carga la cartelera y la pantalla de acceso.</li>
+  <li><b>No verificado:</b> el chat y las reglas de IA con el modelo real (falta la API key de Gemini) y el recorrido con sesión iniciada (compra → QR → check-in → reseña), porque requiere una contraseña.</li>
+</ul>
+</div>
+
+<div class="note">
+<b>Suposiciones.</b> (1) Las HU y sus criterios salen del documento de Google Docs del equipo (US-01 a US-17). (2) El repositorio de iiGabriela es el backend; el de ANIM-OS, el frontend. (3) Los criterios de interfaz se contrastaron buscando cada elemento en el código del frontend, no navegando cada pantalla con sesión iniciada.
+</div>
+
+<h2>Cobertura de historias de usuario</h2>
+<p class="muted">Rutas del backend relativas a la raíz de este repo; las del frontend empiezan con <code>src/</code>.</p>
+<div class="tw">
+<table>
+<thead><tr><th>#</th><th>HU</th><th>Estado</th><th>Evidencia</th><th>Qué cambió / qué falta</th></tr></thead>
+<tbody>
+<tr><td class="n">US-01</td><td>Registro de usuario</td><td><span class="pill ok">Completa · 100</span></td><td><code>UsuarioController.cs</code>, <code>UsuarioService.cs</code>, <code>src/Register.vue</code></td><td>El perfil nace enlazado al UID de Firebase; se envía correo de verificación.</td></tr>
+<tr><td class="n">US-02</td><td>Inicio y cierre de sesión</td><td><span class="pill ok">Completa · 100</span></td><td><code>Middleware/IdentidadMiddleware.cs</code>, <code>IdentidadService.cs</code>, <code>src/Login.vue</code></td><td>"Las funcionalidades protegidas requerirán una sesión válida" ahora se aplica por defecto a toda la API.</td></tr>
+<tr><td class="n">US-03</td><td>Rol asistente y organizador</td><td><span class="pill ok">Completa · 100</span></td><td><code>UsuarioController.cs</code>, <code>src/App.vue</code></td><td>Sin cambios.</td></tr>
+<tr><td class="n">US-04</td><td>Publicación y edición de eventos</td><td><span class="pill ok">Completa · 100</span></td><td><code>EventoService.cs</code>, <code>src/EventForm.vue</code></td><td>Todos los criterios cubiertos. Al publicar o editar se disparan las reglas automáticas (US-15).</td></tr>
+<tr><td class="n">US-05</td><td>Búsqueda y filtrado</td><td><span class="pill ok">Completa · 100</span></td><td><code>EventoController.cs</code>, <code>src/pages/DiscoveryPage.vue</code></td><td>Sin cambios.</td></tr>
+<tr><td class="n">US-06</td><td>Compra de entradas</td><td><span class="pill ok">Completa · 100</span></td><td><code>CompraService.cs</code>, <code>CompraRepository.cs</code></td><td>El criterio de la HU permite pago simulado, así que ya estaba completa. Se añadió límite de peticiones.</td></tr>
+<tr><td class="n">US-07</td><td>Entrada digital con QR</td><td><span class="pill ok">Completa · 100</span></td><td><code>QrService.cs</code>, <code>src/QrDinamico.vue</code></td><td>Sin cambios funcionales; la clave de firma ya no está en el repo.</td></tr>
+<tr><td class="n">US-08</td><td>Check-in con QR</td><td><span class="pill ok">Completa · 100</span></td><td><code>EntradaService.cs</code>, <code>src/AccessControl.vue</code></td><td>Sin cambios. Pendiente de prueba real en la puerta (0 check-ins en Supabase).</td></tr>
+<tr><td class="n">US-09</td><td>Aforo en tiempo real</td><td><span class="pill ok">Completa · 100</span></td><td><code>Hubs/AforoHub.cs</code>, <code>src/aforo.js</code></td><td>Sin cambios.</td></tr>
+<tr><td class="n">US-10</td><td>Recomendaciones</td><td><span class="pill ok">Completa · 100</span></td><td><code>RecomendacionService.cs</code>, <code>docs/US-10-Recomendaciones.md</code></td><td>Sin cambios.</td></tr>
+<tr><td class="n">US-11</td><td>Panel de ventas</td><td><span class="pill ok">Completa · 100</span></td><td><code>VentaController.cs</code></td><td>Sin cambios; nuevo índice por organizador.</td></tr>
+<tr><td class="n">US-12</td><td>Exportar Excel / PDF</td><td><span class="pill ok">Completa · 100</span></td><td><code>VentaController.cs</code></td><td>Sin cambios; exportación a Excel probada en ejecución.</td></tr>
+<tr><td class="n">US-13</td><td>Reseñas</td><td><span class="pill ok">Completa · 100</span></td><td><code>ResenaRepository.cs</code>, <code>ResenaService.cs</code></td><td>Corregido: el criterio exige "entrada con check-in realizado" y antes bastaba con haber comprado.</td></tr>
+<tr><td class="n">US-14</td><td>Notificaciones</td><td><span class="pill ok">Completa · 100</span></td><td><code>NotificacionController.cs</code>, <code>NotificacionRecordatorioWorker.cs</code></td><td>Sin cambios.</td></tr>
+<tr><td class="n">US-15</td><td>Moderación</td><td><span class="pill warn">90 · falta probar con IA real</span></td><td><code>ModeracionAutomaticaService.cs</code>, <code>Services/EvaluadorReglasIA.cs</code>, <code>src/pages/ModerationPage.vue</code></td><td>Nuevo: las reglas automáticas se evalúan al publicar o editar (antes no se evaluaba ninguna) y el admin registra la validación SUNAT/municipal. La lógica tiene pruebas unitarias; falta ejecutarla con Gemini.</td></tr>
+<tr><td class="n">US-16</td><td>Asistente conversacional</td><td><span class="pill warn">90 · falta probar con IA real</span></td><td><code>ChatController.cs</code>, <code>src/EventAssistant.vue</code></td><td>Nuevo: memoria de los últimos turnos, aviso de que responde con RAG, "Contexto RAG" visible. Falta la API key para probarlo.</td></tr>
+<tr><td class="n">US-17</td><td>Recuperación con RAG</td><td><span class="pill warn">90 · falta probar con IA real</span></td><td><code>Services/EventoRagIndex.cs</code>, <code>docs/US-16-RAG.md</code></td><td>Nuevo: embeddings con Gemini, puntaje y cupos por fuente en la interfaz, conversación guardada en <code>conversacion_chat</code>. Falta calibrar <code>AI:MinScore</code> con datos reales.</td></tr>
+</tbody>
+</table>
+</div>
+<p><small>Cálculo: (14 × 100 + 3 × 90) / 17 = 98,2%.</small></p>
+
+<h2>Base de datos vs. código</h2>
+<div class="grid2">
+  <div class="card">
+    <h3 style="margin-top:0">Aplicado en Supabase</h3>
+    <ul>
+      <li>Columna <code>usuario.firebase_uid</code> con índice único.</li>
+      <li>Los 4 perfiles que ya tenían cuenta en Firebase quedaron enlazados a su UID.</li>
+      <li>Índices nuevos: eventos por organizador, reseñas por evento, mensajes de chat, reportes por regla.</li>
+      <li><code>search_path</code> fijo en <code>fn_ventas_por_evento</code> (aviso de Supabase resuelto).</li>
+      <li>Script en el repo: <code>Seguridad_FirebaseUid.sql</code>; <code>00_Esquema_Completo.sql</code> actualizado.</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:0">Estado actual</h3>
+    <ul>
+      <li><code>conversacion_chat</code> y <code>mensaje_chat</code> ya se usan.</li>
+      <li><code>validacion_sunat</code> / <code>validacion_municipal</code> las registra el admin al moderar.</li>
+      <li>Los 5 perfiles de demo <code>@eventia.pe</code> siguen sin UID: no se pueden usar hasta enlazarlos a mano (el script explica cómo).</li>
+      <li>3 cuentas de Firebase <code>@test.com</code> no tienen perfil en la base: al entrar se les pedirá completar el registro.</li>
+      <li><code>compra.estado</code> admite estados que el flujo simulado no usa (aceptable).</li>
+      <li>La extensión <code>vector</code> sigue en el esquema <code>public</code> (aviso menor de Supabase).</li>
+    </ul>
+  </div>
+</div>
+
+<h2>Seguridad</h2>
+<div class="tw">
+<table>
+<thead><tr><th>Severidad</th><th>Hallazgo</th><th>Estado</th><th>Qué se hizo</th></tr></thead>
+<tbody>
+<tr><td><span class="pill bad">Crítico</span></td><td>Toma de cuentas por correo no verificado (incluido el administrador).</td><td><span class="pill ok">Corregido</span></td><td>Identidad por UID de Firebase; perfiles sin UID solo se vinculan con correo verificado; 6 pruebas unitarias cubren los casos. <code>IdentidadService.cs</code>.</td></tr>
+<tr><td><span class="pill warn">Alto</span></td><td>Suplantación con <code>X-User-Email</code> en Development.</td><td><span class="pill ok">Corregido</span></td><td>Apagado por defecto (<code>Auth:PermitirHeaderPrueba</code>). Comprobado en ejecución: con el header y sin token la API responde 401.</td></tr>
+<tr><td><span class="pill info">Medio</span></td><td>Secretos en el repositorio.</td><td><span class="pill warn">Corregido en adelante</span></td><td>Retirados de <code>appsettings.Development.json</code>. Siguen en el historial de git: si esa contraseña de base se usa en algún lugar que no sea una base local, hay que cambiarla.</td></tr>
+<tr><td><span class="pill info">Medio</span></td><td>Sin autorización por defecto.</td><td><span class="pill ok">Corregido</span></td><td><code>IdentidadMiddleware</code> exige sesión en todo salvo <code>[AllowAnonymous]</code>.</td></tr>
+<tr><td><span class="pill info">Medio</span></td><td>Sin límite de peticiones.</td><td><span class="pill ok">Corregido</span></td><td>Chat 10/min, compra 15/min, registro 5/min por usuario.</td></tr>
+<tr><td><span class="pill ok">Bajo</span></td><td>Usuarios bloqueados podían ver entradas, QR y compras.</td><td><span class="pill ok">Corregido</span></td><td>Se comprueba cuenta activa en esas rutas.</td></tr>
+<tr><td><span class="pill ok">Bajo</span></td><td>Historial del chat en <code>localStorage</code>.</td><td><span class="pill info">Aceptado</span></td><td>Solo contiene preguntas sobre eventos públicos, separado por usuario.</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>Qué falta para el 100%</h2>
+<div class="grid2">
+  <div class="card">
+    <h3 style="margin-top:0"><span class="pill bad">Imprescindible para entregar</span></h3>
+    <ul class="check">
+      <li>Crear la API key de Gemini en Google AI Studio, guardarla con <code>dotnet user-secrets</code> y probar el chat y una regla de moderación con IA.</li>
+      <li>Recorrer con sesión iniciada: compra → QR → check-in → reseña → notificación → moderación.</li>
+      <li>Cuentas de la demo: registrar cuentas nuevas desde el frontend y dar el rol de administrador con el <code>INSERT</code> de <code>Seguridad_FirebaseUid.sql</code>, o enlazar a mano los perfiles <code>@eventia.pe</code>.</li>
+      <li>Revisar y fusionar las dos ramas; cada integrante debe configurar su cadena de conexión.</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:0"><span class="pill warn">Recomendable</span></h3>
+    <ul class="check">
+      <li>Calibrar <code>AI:MinScore</code> (0.5) con preguntas reales.</li>
+      <li>Cambiar la contraseña de base que quedó en el historial de git, si se usa fuera de local.</li>
+      <li>Desplegar API y frontend; añadir el dominio a <code>Cors:Origenes</code> y a Firebase.</li>
+      <li>Dividir <code>src/App.vue</code> con <code>vue-router</code> y un store.</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:0"><span class="pill info">Opcional / mejora</span></h3>
+    <ul class="check">
+      <li>CI con <code>dotnet test</code> y <code>vite build</code>.</li>
+      <li>Dockerfile y <code>docker-compose</code>.</li>
+      <li>Pruebas de componentes en el frontend.</li>
+      <li>Subida de imágenes de eventos; notificaciones por correo.</li>
+    </ul>
+  </div>
+</div>
+
+</main>
+</body>
+</html>
