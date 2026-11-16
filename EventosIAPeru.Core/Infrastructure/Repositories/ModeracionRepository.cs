@@ -152,6 +152,16 @@ namespace EventosIAPeru.Core.Infrastructure.Repositories
             return await _dbContext.Usuario.FirstOrDefaultAsync(u => u.UsuarioId == usuarioId);
         }
 
+        public async Task<bool> AsignarRol(int usuarioId, string nombreRol)
+        {
+            var usuario = await _dbContext.Usuario.Include(u => u.Rol).FirstOrDefaultAsync(u => u.UsuarioId == usuarioId);
+            var rol = await _dbContext.Rol.FirstOrDefaultAsync(r => r.Nombre == nombreRol);
+            if (usuario == null || rol == null) return false;
+
+            if (!usuario.Rol.Any(r => r.RolId == rol.RolId)) usuario.Rol.Add(rol);
+            return true;
+        }
+
         // ---------------------------- Auditoría ----------------------------
 
         public async Task<List<Auditoria>> GetAuditoria(DateTime? desde, DateTime? hasta, int max)

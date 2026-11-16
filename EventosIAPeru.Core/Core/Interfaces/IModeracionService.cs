@@ -26,6 +26,7 @@ namespace EventosIAPeru.Core.Core.Interfaces
         Task<(ResultadoOperacion Resultado, List<UsuarioDTO>? Usuarios)> BuscarUsuarios(string emailUsuario, string? texto, string? estado);
         Task<ResultadoOperacion> CambiarEstadoUsuario(string emailUsuario, int usuarioId, CambiarEstadoUsuarioDTO dto);
         Task<ResultadoOperacion> VerificarUsuario(string emailUsuario, int usuarioId);
+        Task<ResultadoOperacion> NombrarAdministrador(string emailUsuario, int usuarioId, NombrarAdministradorDTO dto);
 
         // Auditoría
         Task<(ResultadoOperacion Resultado, List<AuditoriaDTO>? Registros)> GetAuditoria(string emailUsuario, DateTime? desde, DateTime? hasta);

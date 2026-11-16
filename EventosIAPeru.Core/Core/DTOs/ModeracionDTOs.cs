@@ -129,6 +129,15 @@ namespace EventosIAPeru.Core.Core.DTOs
         public bool Confirmado { get; set; }
     }
 
+    // DTO: un admin nombra a otro usuario como ADMINISTRADOR
+    public class NombrarAdministradorDTO
+    {
+        [StringLength(500, ErrorMessage = "El motivo no puede superar los 500 caracteres.")]
+        public string? Motivo { get; set; }
+
+        public bool Confirmado { get; set; }
+    }
+
     // ------------------------- Auditoría -------------------------
 
     // DTO: una fila del log de auditoría

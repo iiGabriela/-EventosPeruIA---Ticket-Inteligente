@@ -25,6 +25,8 @@ namespace EventosIAPeru.Core.Core.Interfaces
         // ---------- Usuarios ----------
         Task<List<Usuario>> BuscarUsuarios(string? texto, string? estado, int max);
         Task<Usuario?> GetUsuarioParaModerar(int usuarioId);
+        // Agrega el rol al usuario sin guardar (se guarda junto con la auditoría en GuardarCambios)
+        Task<bool> AsignarRol(int usuarioId, string nombreRol);
 
         // ---------- Auditoría ----------
         Task<List<Auditoria>> GetAuditoria(DateTime? desde, DateTime? hasta, int max);
