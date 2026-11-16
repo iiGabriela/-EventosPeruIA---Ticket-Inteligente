@@ -140,10 +140,10 @@ var prefix = $"AI:{chatProvider}:";
 var chatEndpoint = builder.Configuration[prefix + "Endpoint"]
     ?? (chatProvider == "Ollama" ? "http://localhost:11434/v1/" : "https://generativelanguage.googleapis.com/v1beta/openai/");
 var chatModel = builder.Configuration[prefix + "ChatModel"]
-    ?? (chatProvider == "Ollama" ? "qwen2.5:7b" : "gemini-flash-latest");
+    ?? (chatProvider == "Ollama" ? "qwen2.5:7b" : "gemini-3.5-flash-lite");
 var chatApiKey = builder.Configuration[prefix + "ApiKey"];
 if (string.IsNullOrWhiteSpace(chatApiKey)) chatApiKey = chatProvider == "Ollama" ? "ollama" : "sin-configurar";
-var chatClient = new ChatClient(chatModel, new ApiKeyCredential(chatApiKey), new OpenAIClientOptions { Endpoint = new Uri(chatEndpoint) });
+var chatClient = new ChatClient(chatModel, new ApiKeyCredential(chatApiKey), new OpenAIClientOptions { Endpoint = new Uri(chatEndpoint), NetworkTimeout = TimeSpan.FromSeconds(25) });
 // El controller usa IChatClient: cambiar de proveedor no modifica el flujo de recuperación.
 builder.Services.AddSingleton<IChatClient>(chatClient.AsIChatClient());
 // Los embeddings se generan con Ollama y se guardan en PostgreSQL/pgvector.
