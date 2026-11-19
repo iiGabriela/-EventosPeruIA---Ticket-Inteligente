@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace EventosIAPeru.Core.Core.Entities;
@@ -12,6 +12,9 @@ public partial class Usuario
     public string Email { get; set; } = null!;
 
     public string? Dni { get; set; }
+
+    /// <summary>UID de Firebase Authentication. Identifica la cuenta; el correo solo sirve para el primer enlace.</summary>
+    public string? FirebaseUid { get; set; }
 
     public string Estado { get; set; } = null!;
 

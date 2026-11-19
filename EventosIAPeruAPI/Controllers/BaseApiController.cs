@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using EventosIAPeru.API.Middleware;
 using EventosIAPeru.Core.Shared;
 
 namespace EventosIAPeru.API.Controllers
@@ -17,17 +18,18 @@ namespace EventosIAPeru.API.Controllers
         }
 
         /// <summary>
-        /// Correo del usuario autenticado (viene en el token de Firebase).
-        /// Solo en Development se acepta el header "X-User-Email" para probar sin token.
+        /// Correo del perfil que corresponde a la sesión. Lo resuelve IdentidadMiddleware a partir
+        /// del UID de Firebase; aquí nunca se lee directamente el correo del token.
         /// </summary>
         protected string? ObtenerEmailUsuario()
         {
-            var email = User.ObtenerEmail();
-            if (email == null && _environment.IsDevelopment())
-            {
-                email = Request.Headers["X-User-Email"].FirstOrDefault();
-            }
-            return string.IsNullOrWhiteSpace(email) ? null : email.Trim().ToLowerInvariant();
+            return HttpContext.Items[IdentidadMiddleware.ClaveEmail] as string;
+        }
+
+        /// <summary>UID de Firebase de la sesión (null con el atajo de pruebas).</summary>
+        protected string? ObtenerFirebaseUid()
+        {
+            return HttpContext.Items[IdentidadMiddleware.ClaveUid] as string;
         }
 
         // Convierte el ResultadoOperacion en el código HTTP que corresponde

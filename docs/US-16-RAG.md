@@ -1,12 +1,12 @@
 # US-16: recuperación de información de eventos
 
-El chat depende de `IChatClient` (Microsoft.Extensions.AI). El proveedor puede ser Ollama o Gemini con endpoint compatible con OpenAI; los embeddings se generan con Ollama. No se envían herramientas al modelo.
+El chat depende de `IChatClient` (Microsoft.Extensions.AI). El proveedor puede ser Ollama o Gemini con endpoint compatible con OpenAI; los embeddings se generan con el mismo proveedor elegido (Gemini por su API REST u Ollama en local). No se envían herramientas al modelo.
 
 ## Configuración
 
-En `appsettings.Development.json`, `AI:Provider` selecciona el proveedor. Cada proveedor define `Endpoint`, `ChatModel` y `ApiKey` (Ollama local no requiere una clave real). Para Gemini, usar endpoint `https://generativelanguage.googleapis.com/v1beta/openai/` y configurar modelo y clave. La API falla al iniciar si faltan los valores obligatorios de Gemini.
+En `appsettings.json`, `AI:Provider` selecciona el proveedor. Cada proveedor define `Endpoint`, `ChatModel` y `ApiKey` (Ollama local no requiere una clave real). Para Gemini, usar endpoint `https://generativelanguage.googleapis.com/v1beta/openai/` y configurar modelo y clave. La API falla al iniciar si faltan los valores obligatorios de Gemini.
 
-`AI:Ollama:EmbeddingModel` define el modelo de embeddings; `AI:EmbeddingDimensions` debe coincidir con su dimensión (768 para nomic-embed-text). `AI:TopK` limita las fuentes (1–10); `AI:MinScore` define la similitud coseno mínima (0.6 por defecto; ajustar con preguntas representativas).
+`AI:Gemini:EmbeddingModel` o `AI:Ollama:EmbeddingModel` define el modelo de embeddings; `AI:EmbeddingDimensions` debe coincidir con su dimensión (768 para nomic-embed-text). `AI:TopK` limita las fuentes (1–10); `AI:MinScore` define la similitud coseno mínima (0.6 por defecto; ajustar con preguntas representativas).
 
 ## Indexación y vigencia
 
@@ -48,3 +48,12 @@ Para Nomic se utilizan los prefijos `search_document:` al indexar y `search_quer
 - **Respaldo por precio:** "gratis" no se parece semánticamente a "precio 0". Si la pregunta menciona eventos gratuitos, se agregan los eventos indexados con precio 0.
 - El campo `retrieval` de la respuesta indica cuándo se usó un respaldo, para que la fuente siga siendo trazable (US-17).
 - El modelo de chat por defecto es `qwen2.5:7b` (≈4,7 GB; cabe en una GPU de 8 GB). Modelos más pequeños responden más rápido pero redactan peor.
+
+## Proveedor por defecto y conversación
+
+- El proveedor por defecto es **Gemini** (`AI:Provider`): no requiere instalar nada, solo la API key en `AI:Gemini:ApiKey` (user-secrets o variable de entorno, nunca en el repositorio). Sin clave, la API arranca y el chat responde 503.
+- Los embeddings de Gemini se piden con 768 dimensiones para conservar la columna `vector(768)`. Cada vector guarda el modelo con el que se creó, así que al cambiar de proveedor el worker reindexa todo sin intervención.
+- `AI:MinScore` se ajustó a 0.5 para Gemini; si las respuestas traen pocas fuentes o fuentes poco relacionadas, es el primer valor a calibrar.
+- El chat acepta `history` (últimos turnos de la conversación). Se usan como máximo 6 turnos recortados; una repregunta corta se busca junto con la pregunta anterior para recuperar el mismo evento.
+- Cada pregunta y respuesta se guarda en `conversacion_chat` / `mensaje_chat` (una conversación agrupa 12 horas de mensajes del usuario).
+- La respuesta incluye `fundamento` (aviso de que se basa en los eventos publicados) y, por cada fuente, `score` y `cuposDisponibles` (US-17).

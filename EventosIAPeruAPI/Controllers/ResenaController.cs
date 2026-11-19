@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using EventosIAPeru.Core.Core.DTOs;
 using EventosIAPeru.Core.Core.Interfaces;
@@ -34,6 +35,7 @@ namespace EventosIAPeru.API.Controllers
 
         /// <summary>Promedio de calificaciones y reseñas publicadas de un evento (público).</summary>
         [HttpGet("evento/{eventoId:int}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetResenasDeEvento(int eventoId)
         {
             var resumen = await _resenaService.GetResenasDeEvento(eventoId);

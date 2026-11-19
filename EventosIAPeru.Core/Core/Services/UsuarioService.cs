@@ -27,7 +27,7 @@ namespace EventosIAPeru.Core.Core.Services
 
         // ---------------------------- US-01 ----------------------------
 
-        public async Task<ResultadoOperacion> Registrar(string emailUsuario, RegistroUsuarioDTO dto)
+        public async Task<ResultadoOperacion> Registrar(string emailUsuario, RegistroUsuarioDTO dto, string? firebaseUid = null)
         {
             // Limpiamos espacios y dejamos el correo en minúsculas
             var nombre = dto.Nombre.Trim();
@@ -49,6 +49,8 @@ namespace EventosIAPeru.Core.Core.Services
                 Nombre = nombre,
                 Email = email,
                 Dni = dni,
+                // El perfil nace enlazado a la cuenta de Firebase que lo creó
+                FirebaseUid = string.IsNullOrWhiteSpace(firebaseUid) ? null : firebaseUid,
                 Estado = "ACTIVO",
                 Verificado = false,
                 FechaRegistro = DateTime.UtcNow

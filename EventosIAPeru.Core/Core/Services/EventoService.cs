@@ -15,13 +15,16 @@ namespace EventosIAPeru.Core.Core.Services
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly INotificacionService _notificacionService;
         private readonly INotificadorAforo _notificadorAforo;
+        private readonly IModeracionAutomatica? _moderacionAutomatica;
 
         public EventoService(IEventoRepository eventoRepository,
                              ICategoriaRepository categoriaRepository,
                              IUsuarioRepository usuarioRepository,
                              INotificacionService notificacionService,
-                             INotificadorAforo notificadorAforo)
+                             INotificadorAforo notificadorAforo,
+                             IModeracionAutomatica? moderacionAutomatica = null)
         {
+            _moderacionAutomatica = moderacionAutomatica;
             _eventoRepository = eventoRepository;
             _categoriaRepository = categoriaRepository;
             _usuarioRepository = usuarioRepository;
@@ -152,6 +155,10 @@ namespace EventosIAPeru.Core.Core.Services
             if (eventoActualizado.AforoTotal != evento.AforoTotal)
                 await _notificadorAforo.CuposActualizados(evento.EventoId, eventoActualizado.AforoTotal, entradasVendidas);
 
+            // US-15: un evento ya publicado se vuelve a revisar con las reglas automáticas
+            if (evento.Estado == "PUBLICADO" && _moderacionAutomatica != null)
+                await _moderacionAutomatica.EvaluarEvento(evento.EventoId);
+
             return ResultadoOperacion.Ok(evento.EventoId);
         }
 
@@ -169,6 +176,10 @@ namespace EventosIAPeru.Core.Core.Services
 
             var actualizado = await _eventoRepository.UpdateEstado(id, "PUBLICADO");
             if (!actualizado) return ResultadoOperacion.Invalido("No se pudo publicar el evento.");
+
+            // US-15: reglas automáticas de moderación (simples y de IA) sobre el evento recién publicado
+            if (_moderacionAutomatica != null)
+                await _moderacionAutomatica.EvaluarEvento(id);
 
             return ResultadoOperacion.Ok(id);
         }

@@ -143,6 +143,9 @@ namespace EventosIAPeru.Core.Core.Services
 
             evento.EstadoModeracion = nuevoEstado;
             evento.MotivoModeracion = string.IsNullOrWhiteSpace(motivo) ? null : motivo;
+            // El admin deja constancia de la documentación que revisó (RUC en SUNAT, licencia municipal)
+            if (dto.ValidacionSunat.HasValue) evento.ValidacionSunat = dto.ValidacionSunat;
+            if (dto.ValidacionMunicipal.HasValue) evento.ValidacionMunicipal = dto.ValidacionMunicipal;
             evento.FechaActualizacion = DateTime.UtcNow;
 
             var auditoria = NuevaAuditoria(admin!.UsuarioId, "EVENTO_" + nuevoEstado, motivo);
@@ -313,6 +316,42 @@ namespace EventosIAPeru.Core.Core.Services
 
             var guardado = await _moderacionRepository.GuardarCambios();
             if (!guardado) return ResultadoOperacion.Invalido("No se pudo verificar al usuario.");
+
+            return ResultadoOperacion.Ok(usuario.UsuarioId);
+        }
+
+        // El rol ADMINISTRADOR no se puede pedir desde la app: solo otro administrador lo otorga,
+        // y queda en la auditoría quién nombró a quién y por qué.
+        public async Task<ResultadoOperacion> NombrarAdministrador(string emailUsuario, int usuarioId, NombrarAdministradorDTO dto)
+        {
+            var (admin, error) = await ObtenerAdmin(emailUsuario);
+            if (error != null) return error;
+
+            if (!dto.Confirmado)
+                return ResultadoOperacion.Invalido("Debes confirmar la acción de moderación.");
+
+            var motivo = dto.Motivo?.Trim();
+            if (string.IsNullOrWhiteSpace(motivo) || motivo.Length < 5)
+                return ResultadoOperacion.Invalido("Indica el motivo (mínimo 5 caracteres) para nombrar a un administrador.");
+
+            var usuario = await _moderacionRepository.GetUsuarioParaModerar(usuarioId);
+            if (usuario == null) return ResultadoOperacion.NoEncontrado("El usuario no existe.");
+
+            if (usuario.Estado != "ACTIVO")
+                return ResultadoOperacion.Invalido("Solo una cuenta activa puede ser administradora.");
+
+            if (await _usuarioRepository.TieneRol(usuario.UsuarioId, RolAdministrador))
+                return ResultadoOperacion.Invalido("Este usuario ya es administrador.");
+
+            if (!await _moderacionRepository.AsignarRol(usuario.UsuarioId, RolAdministrador))
+                return ResultadoOperacion.Invalido("No se pudo asignar el rol de administrador.");
+
+            var auditoria = NuevaAuditoria(admin!.UsuarioId, "USUARIO_ADMINISTRADOR", motivo);
+            auditoria.UsuarioAfectadoId = usuario.UsuarioId;
+            _moderacionRepository.AgregarAuditoria(auditoria);
+
+            var guardado = await _moderacionRepository.GuardarCambios();
+            if (!guardado) return ResultadoOperacion.Invalido("No se pudo asignar el rol de administrador.");
 
             return ResultadoOperacion.Ok(usuario.UsuarioId);
         }

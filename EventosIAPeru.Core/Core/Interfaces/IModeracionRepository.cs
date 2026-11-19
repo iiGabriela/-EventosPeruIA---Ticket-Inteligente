@@ -19,10 +19,14 @@ namespace EventosIAPeru.Core.Core.Interfaces
         Task<bool> ExisteEvento(int eventoId);
         Task<bool> ExisteReportePendiente(int usuarioId, int eventoId);
         void AgregarReporte(ReporteEvento reporte);
+        // ¿La regla automática ya dejó un reporte sin resolver para este evento?
+        Task<bool> ExisteReportePendienteDeRegla(int eventoId, int reglaId);
 
         // ---------- Usuarios ----------
         Task<List<Usuario>> BuscarUsuarios(string? texto, string? estado, int max);
         Task<Usuario?> GetUsuarioParaModerar(int usuarioId);
+        // Agrega el rol al usuario sin guardar (se guarda junto con la auditoría en GuardarCambios)
+        Task<bool> AsignarRol(int usuarioId, string nombreRol);
 
         // ---------- Auditoría ----------
         Task<List<Auditoria>> GetAuditoria(DateTime? desde, DateTime? hasta, int max);

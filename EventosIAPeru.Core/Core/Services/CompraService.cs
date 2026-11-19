@@ -1,4 +1,4 @@
-﻿using EventosIAPeru.Core.Core.DTOs;
+using EventosIAPeru.Core.Core.DTOs;
 using EventosIAPeru.Core.Core.Entities;
 using EventosIAPeru.Core.Core.Interfaces;
 using EventosIAPeru.Core.Shared;
@@ -104,6 +104,7 @@ public class CompraService : ICompraService
     {
         var usuario = await _usuarioRepository.GetUsuarioByEmail(emailUsuario);
         if (usuario == null) return (ResultadoOperacion.NoAutorizado("Usuario no encontrado."), null);
+        if (usuario.Estado != "ACTIVO") return (ResultadoOperacion.NoAutorizado("Tu cuenta no está activa."), null);
 
         var compras = await _compraRepository.GetComprasDeUsuario(usuario.UsuarioId);
         return (ResultadoOperacion.Ok(), compras.Select(MapearCompra).ToList());
@@ -113,6 +114,7 @@ public class CompraService : ICompraService
     {
         var usuario = await _usuarioRepository.GetUsuarioByEmail(emailUsuario);
         if (usuario == null) return (ResultadoOperacion.NoAutorizado("Usuario no encontrado."), null);
+        if (usuario.Estado != "ACTIVO") return (ResultadoOperacion.NoAutorizado("Tu cuenta no está activa."), null);
 
         var compra = await _compraRepository.GetCompraPorId(compraId);
         if (compra == null) return (ResultadoOperacion.NoEncontrado("Compra no encontrada."), null);

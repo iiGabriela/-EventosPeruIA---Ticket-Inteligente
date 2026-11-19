@@ -122,6 +122,12 @@ namespace EventosIAPeru.Core.Infrastructure.Repositories
             _dbContext.ReporteEvento.Add(reporte);
         }
 
+        public async Task<bool> ExisteReportePendienteDeRegla(int eventoId, int reglaId)
+        {
+            return await _dbContext.ReporteEvento
+                            .AnyAsync(r => r.EventoId == eventoId && r.ReglaId == reglaId && r.Estado == "PENDIENTE");
+        }
+
         // ---------------------------- Usuarios ----------------------------
 
         public async Task<List<Usuario>> BuscarUsuarios(string? texto, string? estado, int max)
@@ -144,6 +150,16 @@ namespace EventosIAPeru.Core.Infrastructure.Repositories
         public async Task<Usuario?> GetUsuarioParaModerar(int usuarioId)
         {
             return await _dbContext.Usuario.FirstOrDefaultAsync(u => u.UsuarioId == usuarioId);
+        }
+
+        public async Task<bool> AsignarRol(int usuarioId, string nombreRol)
+        {
+            var usuario = await _dbContext.Usuario.Include(u => u.Rol).FirstOrDefaultAsync(u => u.UsuarioId == usuarioId);
+            var rol = await _dbContext.Rol.FirstOrDefaultAsync(r => r.Nombre == nombreRol);
+            if (usuario == null || rol == null) return false;
+
+            if (!usuario.Rol.Any(r => r.RolId == rol.RolId)) usuario.Rol.Add(rol);
+            return true;
         }
 
         // ---------------------------- Auditoría ----------------------------

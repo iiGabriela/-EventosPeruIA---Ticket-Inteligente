@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using EventosIAPeru.Core.Core.Interfaces;
 
@@ -5,6 +6,7 @@ namespace EventosIAPeru.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [AllowAnonymous] // La cartelera pública necesita las categorías sin sesión
     public class CategoriaController : ControllerBase
     {
         private readonly ICategoriaService _categoriaService;

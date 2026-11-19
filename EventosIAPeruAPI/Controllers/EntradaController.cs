@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using EventosIAPeru.Core.Core.DTOs;
 using EventosIAPeru.Core.Core.Interfaces;
 
@@ -25,7 +25,7 @@ namespace EventosIAPeru.API.Controllers
 
             var entradas = await _entradaService.GetMisEntradas(emailUsuario);
             if (entradas == null)
-                return NotFound(new { mensaje = "Usuario no encontrado." });
+                return NotFound(new { mensaje = "Usuario no encontrado o cuenta inactiva." });
 
             return Ok(entradas);
         }

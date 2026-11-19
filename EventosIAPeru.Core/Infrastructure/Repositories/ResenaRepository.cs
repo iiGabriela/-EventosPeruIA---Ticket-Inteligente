@@ -23,7 +23,7 @@ namespace EventosIAPeru.Core.Infrastructure.Repositories
                             .FirstOrDefaultAsync(e => e.EventoId == eventoId);
         }
 
-        // Entrada válida = compra CONFIRMADA y entrada que no esté ANULADA.
+        // US-13: asistió = compra CONFIRMADA y entrada con check-in registrado en la puerta.
         // Sirve si el usuario compró la entrada o si figura como asistente.
         public async Task<bool> TieneEntradaValida(int usuarioId, int eventoId)
         {
@@ -32,6 +32,7 @@ namespace EventosIAPeru.Core.Infrastructure.Repositories
                             .AnyAsync(c => c.EventoId == eventoId
                                         && c.Estado == "CONFIRMADA"
                                         && c.Entrada.Any(en => en.Estado != "ANULADA"
+                                                            && en.CheckIn != null
                                                             && (c.UsuarioId == usuarioId || en.AsistenteUsuarioId == usuarioId)));
         }
 
@@ -102,6 +103,7 @@ namespace EventosIAPeru.Core.Infrastructure.Repositories
                             .Where(e => e.FechaFin < ahora
                                      && e.Compra.Any(c => c.Estado == "CONFIRMADA"
                                                        && c.Entrada.Any(en => en.Estado != "ANULADA"
+                                                                           && en.CheckIn != null
                                                                            && (c.UsuarioId == usuarioId || en.AsistenteUsuarioId == usuarioId)))
                                      && !e.ResenaEvento.Any(r => r.UsuarioId == usuarioId))
                             .OrderByDescending(e => e.FechaFin)

@@ -11,6 +11,12 @@ namespace EventosIAPeru.Core.Core.Interfaces
         // Busca al usuario logueado por su correo (el que viene en el token de Firebase)
         Task<Usuario?> GetUsuarioByEmail(string email);
 
+        // Busca al usuario por el UID de Firebase (la identidad real de la cuenta)
+        Task<Usuario?> GetUsuarioByFirebaseUid(string firebaseUid);
+
+        // Enlaza un perfil que aún no tiene UID con su cuenta de Firebase. Devuelve false si otro lo enlazó antes.
+        Task<bool> VincularFirebaseUid(int usuarioId, string firebaseUid);
+
         // Igual que el anterior pero trae también sus roles
         Task<Usuario?> GetUsuarioConRoles(string email);
 

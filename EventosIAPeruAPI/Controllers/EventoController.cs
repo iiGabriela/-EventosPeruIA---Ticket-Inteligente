@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using EventosIAPeru.Core.Core.DTOs;
 using EventosIAPeru.Core.Core.Interfaces;
@@ -24,6 +25,7 @@ namespace EventosIAPeru.API.Controllers
 
         /// <summary>Búsqueda con filtros combinables: texto, categoría, ubicación y fechas.</summary>
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> BuscarEventos([FromQuery] FiltroEventoDTO filtro)
         {
             if (filtro.FechaDesde.HasValue && filtro.FechaHasta.HasValue && filtro.FechaDesde > filtro.FechaHasta)
@@ -51,6 +53,7 @@ namespace EventosIAPeru.API.Controllers
         }
 
         [HttpGet("{id:int}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetEventoById(int id)
         {
             var evento = await _eventoService.GetEventoById(id, ObtenerEmailUsuario());

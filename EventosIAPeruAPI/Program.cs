@@ -16,6 +16,9 @@ using OpenAI.Chat;
 using System.ClientModel;
 using EventosIAPeru.API.Services;
 using EventosIAPeru.API.Hubs;
+using System.Security.Cryptography;
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,6 +46,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 // Usuarios (US-01..03, Gabriela)
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
+// US-02: enlaza la sesión de Firebase (UID) con el perfil de la base
+builder.Services.AddScoped<IIdentidadService, IdentidadService>();
 
 // Reseñas (US-13, Gabriela)
 builder.Services.AddScoped<IResenaRepository, ResenaRepository>();
@@ -51,6 +56,9 @@ builder.Services.AddScoped<IResenaService, ResenaService>();
 // Moderación (US-15, Gabriela)
 builder.Services.AddScoped<IModeracionRepository, ModeracionRepository>();
 builder.Services.AddScoped<IModeracionService, ModeracionService>();
+// US-15: reglas automáticas (simples y de IA) al publicar o editar un evento
+builder.Services.AddScoped<IModeracionAutomatica, ModeracionAutomaticaService>();
+builder.Services.AddScoped<IEvaluadorReglasIA, EvaluadorReglasIA>();
 
 // Categorías y Eventos (US-04, US-05)
 builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
@@ -76,6 +84,11 @@ builder.Services.AddScoped<IEntradaRepository, EntradaRepository>();
 builder.Services.AddScoped<IEntradaService, EntradaService>();
 // US-07: QR dinámico firmado (appsettings -> Qr:ClaveFirma, Qr:SegundosValidez)
 var qrSettings = builder.Configuration.GetSection("Qr").Get<QrSettings>() ?? new QrSettings();
+// En Development no hace falta configurar nada: se genera una clave nueva en cada arranque.
+// Los QR duran segundos, así que reiniciar la API no invalida ninguna entrada (el código de la entrada está en la BD).
+// Fuera de Development la clave es obligatoria (Qr__ClaveFirma) y QrService falla si falta.
+if (builder.Environment.IsDevelopment() && string.IsNullOrWhiteSpace(qrSettings.ClaveFirma))
+    qrSettings.ClaveFirma = Convert.ToHexString(RandomNumberGenerator.GetBytes(32));
 builder.Services.AddSingleton<IQrService>(new QrService(qrSettings));
 
 // US-09: cupos en tiempo real (SignalR en /hubs/aforo)
@@ -98,18 +111,39 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddControllers();
 
+// Límite de peticiones por usuario (o por IP si no hay sesión) en las rutas que más cuestan:
+// el chat consume cuota del proveedor de IA y la compra bloquea filas en la base.
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.OnRejected = async (contexto, ct) =>
+        await contexto.HttpContext.Response.WriteAsJsonAsync(
+            new { mensaje = "Hay demasiados intentos. Espera un momento y vuelve a intentar." }, ct);
+
+    void Politica(string nombre, int porMinuto) => options.AddPolicy(nombre, http =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            http.Items[IdentidadMiddleware.ClaveEmail] as string
+                ?? http.Connection.RemoteIpAddress?.ToString() ?? "anonimo",
+            _ => new FixedWindowRateLimiterOptions { PermitLimit = porMinuto, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
+
+    Politica("chat", 10);
+    Politica("compra", 15);
+    Politica("registro", 5);
+});
+
 // Chatbot con recuperación de eventos (US-16): proveedor y modelo configurados en la sección AI.
-var chatProvider = builder.Configuration["AI:Provider"] ?? "Ollama";
+var chatProvider = builder.Configuration["AI:Provider"] ?? "Gemini";
 if (chatProvider is not ("Ollama" or "Gemini")) throw new InvalidOperationException("AI:Provider debe ser Ollama o Gemini.");
 var prefix = $"AI:{chatProvider}:";
-// Ollama funciona localmente; Gemini requiere su modelo y API key configurados.
+// Gemini funciona en la nube con una API key gratuita de Google AI Studio (no hay que instalar nada);
+// Ollama funciona localmente. Sin API key la API arranca igual y el asistente responde 503 hasta configurarla.
 var chatEndpoint = builder.Configuration[prefix + "Endpoint"]
     ?? (chatProvider == "Ollama" ? "http://localhost:11434/v1/" : "https://generativelanguage.googleapis.com/v1beta/openai/");
 var chatModel = builder.Configuration[prefix + "ChatModel"]
-    ?? (chatProvider == "Ollama" ? "qwen2.5:7b" : throw new InvalidOperationException("Configura AI:Gemini:ChatModel."));
-var chatApiKey = builder.Configuration[prefix + "ApiKey"]
-    ?? (chatProvider == "Ollama" ? "ollama" : throw new InvalidOperationException("Configura AI:Gemini:ApiKey."));
-var chatClient = new ChatClient(chatModel, new ApiKeyCredential(chatApiKey), new OpenAIClientOptions { Endpoint = new Uri(chatEndpoint) });
+    ?? (chatProvider == "Ollama" ? "qwen2.5:7b" : "gemini-3.5-flash-lite");
+var chatApiKey = builder.Configuration[prefix + "ApiKey"];
+if (string.IsNullOrWhiteSpace(chatApiKey)) chatApiKey = chatProvider == "Ollama" ? "ollama" : "sin-configurar";
+var chatClient = new ChatClient(chatModel, new ApiKeyCredential(chatApiKey), new OpenAIClientOptions { Endpoint = new Uri(chatEndpoint), NetworkTimeout = TimeSpan.FromSeconds(25) });
 // El controller usa IChatClient: cambiar de proveedor no modifica el flujo de recuperación.
 builder.Services.AddSingleton<IChatClient>(chatClient.AsIChatClient());
 // Los embeddings se generan con Ollama y se guardan en PostgreSQL/pgvector.
@@ -144,6 +178,10 @@ app.UseCors("Frontend");
 // Primero se identifica quién es (token) y luego se revisan permisos
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Resuelve el perfil por UID de Firebase y exige sesión en todo lo que no sea [AllowAnonymous]
+app.UseMiddleware<IdentidadMiddleware>();
+app.UseRateLimiter();
 
 app.MapControllers();
 app.MapHub<AforoHub>("/hubs/aforo");

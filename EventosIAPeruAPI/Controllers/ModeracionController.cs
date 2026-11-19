@@ -151,6 +151,17 @@ namespace EventosIAPeru.API.Controllers
             return Responder(result);
         }
 
+        /// <summary>Nombra a otro usuario como ADMINISTRADOR (solo un admin puede hacerlo; queda en auditoría).</summary>
+        [HttpPut("usuarios/{id:int}/administrador")]
+        public async Task<IActionResult> NombrarAdministrador(int id, [FromBody] NombrarAdministradorDTO dto)
+        {
+            var emailUsuario = ObtenerEmailUsuario();
+            if (emailUsuario == null) return Unauthorized(new { mensaje = "Debe iniciar sesión." });
+
+            var result = await _moderacionService.NombrarAdministrador(emailUsuario, id, dto);
+            return Responder(result);
+        }
+
         // ---------------------------- Auditoría ----------------------------
 
         /// <summary>Log de auditoría (últimos 200 registros, con filtro opcional por fechas).</summary>
