@@ -9,6 +9,7 @@ public interface INotificacionRepository
     Task<bool> ExisteNotificacion(int usuarioId, int eventoId, string titulo);
     Task<List<Compra>> GetComprasDeEventosProximos(DateTime desde, DateTime hasta, int? usuarioId = null);
     Task<List<int>> GetUsuariosConCompraConfirmada(int eventoId);
+    Task<List<int>> GetAdministradoresActivos();
     Task CrearNotificaciones(IEnumerable<Notificacion> notificaciones);
     Task MarcarComoLeida(Notificacion notificacion);
     Task MarcarTodasComoLeidas(int usuarioId);

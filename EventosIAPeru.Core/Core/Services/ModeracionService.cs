@@ -27,10 +27,13 @@ namespace EventosIAPeru.Core.Core.Services
         private readonly IModeracionRepository _moderacionRepository;
         private readonly IUsuarioRepository _usuarioRepository;
 
-        public ModeracionService(IModeracionRepository moderacionRepository, IUsuarioRepository usuarioRepository)
+        private readonly INotificacionService? _notificacionService;
+
+        public ModeracionService(IModeracionRepository moderacionRepository, IUsuarioRepository usuarioRepository, INotificacionService? notificacionService = null)
         {
             _moderacionRepository = moderacionRepository;
             _usuarioRepository = usuarioRepository;
+            _notificacionService = notificacionService;
         }
 
         // ---------------------------- Panel ----------------------------
@@ -106,6 +109,17 @@ namespace EventosIAPeru.Core.Core.Services
                 ValidacionSunat = evento.ValidacionSunat,
                 ValidacionMunicipal = evento.ValidacionMunicipal,
                 AforoTotal = evento.AforoTotal,
+                Descripcion = evento.Descripcion,
+                ImagenUrl = evento.ImagenUrl,
+                CategoriaNombre = evento.Categoria?.Nombre,
+                FechaInicio = evento.FechaInicio,
+                FechaFin = evento.FechaFin,
+                Sede = evento.Sede,
+                Direccion = evento.Direccion,
+                Distrito = evento.Distrito,
+                Provincia = evento.Provincia,
+                Departamento = evento.Departamento,
+                Precio = evento.Precio,
                 ReportesActivos = evento.ReporteEvento.Count(r => r.Estado == "PENDIENTE"),
                 Reportes = evento.ReporteEvento
                                  .OrderByDescending(r => r.FechaReporte)
@@ -139,7 +153,7 @@ namespace EventosIAPeru.Core.Core.Services
 
             // Si aprueba sin motivo, ponemos uno por defecto
             if (string.IsNullOrWhiteSpace(motivo) && nuevoEstado == "CONFORME")
-                motivo = "Documentación validada";
+                motivo = "Evento aprobado";
 
             evento.EstadoModeracion = nuevoEstado;
             evento.MotivoModeracion = string.IsNullOrWhiteSpace(motivo) ? null : motivo;
@@ -154,6 +168,10 @@ namespace EventosIAPeru.Core.Core.Services
 
             var guardado = await _moderacionRepository.GuardarCambios();
             if (!guardado) return ResultadoOperacion.Invalido("No se pudo guardar la moderación.");
+
+            // El organizador se entera de la decisión por una notificación
+            if (_notificacionService != null)
+                await _notificacionService.NotificarDecisionModeracion(evento, nuevoEstado, motivo);
 
             return ResultadoOperacion.Ok(evento.EventoId);
         }

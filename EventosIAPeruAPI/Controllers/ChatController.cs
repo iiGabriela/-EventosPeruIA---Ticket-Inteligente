@@ -59,7 +59,7 @@ public sealed class ChatController(EventosPeruIAContext db, IChatClient chat, Ev
         // pgvector calcula la similitud en PostgreSQL. Excluimos índices antiguos y eventos no públicos o finalizados.
         var candidatos = db.EventoEmbedding.AsNoTracking()
             .Where(x => x.Modelo == model && x.NumeroFragmento == 0 && x.FechaIndexacion >= x.Evento.FechaActualizacion
-                && x.Evento.Estado == "PUBLICADO" && x.Evento.EstadoModeracion != "DESACTIVADO" && x.Evento.FechaFin > now)
+                && x.Evento.Estado == "PUBLICADO" && x.Evento.EstadoModeracion == "CONFORME" && x.Evento.FechaFin > now)
             .Select(x => new {
                 eventoId = x.EventoId, evento = x.Evento.Nombre,
                 fragmento = x.Evento.Descripcion, // La descripción y los demás datos se leen del evento actual en BD.

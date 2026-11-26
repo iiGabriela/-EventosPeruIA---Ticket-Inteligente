@@ -16,6 +16,8 @@ namespace EventosIAPeru.Core.Core.Interfaces
 
         // Guarda la reseña
         Task<bool> CrearResena(ResenaEvento resena);
+        /// <summary>Reseñas con comentario más recientes, para la página principal.</summary>
+        Task<List<ResenaEvento>> GetResenasRecientes(int cantidad);
 
         // Promedio de calificaciones y cantidad de reseñas de un evento
         Task<(double Promedio, int Total)> GetResumen(int eventoId);

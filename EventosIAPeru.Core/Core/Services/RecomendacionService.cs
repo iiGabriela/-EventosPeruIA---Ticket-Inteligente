@@ -150,7 +150,7 @@ public class RecomendacionService : IRecomendacionService
             Agotado = cupos == 0,
             Finalizado = evento.FechaFin <= ahora,
             DisponibleParaCompra = evento.Estado == "PUBLICADO"
-                                  && evento.EstadoModeracion != "DESACTIVADO"
+                                  && evento.EstadoModeracion == "CONFORME"
                                   && evento.FechaInicio > ahora
                                   && cupos > 0,
             PuntajeAfinidad = puntaje,

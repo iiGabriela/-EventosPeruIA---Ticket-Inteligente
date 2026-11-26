@@ -105,7 +105,7 @@ public sealed class EventoRagIndex(EventosPeruIAContext db, IHttpClientFactory c
         var snapshot = DateTime.UtcNow;
         // Solo procesamos eventos visibles y vigentes que aún no tienen un índice actualizado del mismo modelo.
         var events = await db.Evento.AsNoTracking().Include(e => e.Categoria)
-            .Where(e => e.Estado == "PUBLICADO" && e.EstadoModeracion != "DESACTIVADO" && e.FechaFin > snapshot
+            .Where(e => e.Estado == "PUBLICADO" && e.EstadoModeracion == "CONFORME" && e.FechaFin > snapshot
                 && !db.EventoEmbedding.Any(x => x.EventoId == e.EventoId && x.NumeroFragmento == 0
                     && x.Modelo == IndexModel && x.FechaIndexacion >= e.FechaActualizacion))
             .OrderBy(e => e.EventoId).Take(20).ToListAsync(ct);

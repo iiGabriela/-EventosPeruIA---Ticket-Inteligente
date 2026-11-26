@@ -33,6 +33,14 @@ namespace EventosIAPeru.API.Controllers
                                    new { mensaje = "Reseña registrada correctamente.", resenaId = result.Id });
         }
 
+        /// <summary>Página principal: reseñas recientes de eventos realizados (público).</summary>
+        [HttpGet("recientes")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetResenasRecientes([FromQuery] int cantidad = 6)
+        {
+            return Ok(await _resenaService.GetResenasRecientes(cantidad));
+        }
+
         /// <summary>Promedio de calificaciones y reseñas publicadas de un evento (público).</summary>
         [HttpGet("evento/{eventoId:int}")]
         [AllowAnonymous]

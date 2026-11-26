@@ -174,12 +174,16 @@ namespace EventosIAPeru.Core.Core.Services
             if (evento.FechaInicio <= DateTime.UtcNow)
                 return ResultadoOperacion.Invalido("No se puede publicar un evento con fecha pasada.");
 
-            var actualizado = await _eventoRepository.UpdateEstado(id, "PUBLICADO");
-            if (!actualizado) return ResultadoOperacion.Invalido("No se pudo publicar el evento.");
+            // US-15: el organizador solicita la aprobación. El evento queda "En revisión" y no se ve
+            // en la cartelera ni se vende hasta que un administrador lo apruebe.
+            var actualizado = await _eventoRepository.SolicitarAprobacion(id);
+            if (!actualizado) return ResultadoOperacion.Invalido("No se pudo enviar la solicitud de aprobación.");
 
-            // US-15: reglas automáticas de moderación (simples y de IA) sobre el evento recién publicado
+            // Las reglas automáticas (simples y de IA) dejan sus reportes para que el admin los vea al revisar
             if (_moderacionAutomatica != null)
                 await _moderacionAutomatica.EvaluarEvento(id);
+
+            await _notificacionService.NotificarSolicitudAprobacion(evento);
 
             return ResultadoOperacion.Ok(id);
         }
@@ -225,7 +229,7 @@ namespace EventosIAPeru.Core.Core.Services
 
         private static bool EsVisibleAlPublico(Evento evento)
         {
-            return evento.Estado == "PUBLICADO" && evento.EstadoModeracion != "DESACTIVADO";
+            return evento.Estado == "PUBLICADO" && evento.EstadoModeracion == "CONFORME";
         }
 
         private static void CopiarDatos(CrearEventoDTO origen, Evento destino, DateTime fechaInicioUtc, DateTime fechaFinUtc)
