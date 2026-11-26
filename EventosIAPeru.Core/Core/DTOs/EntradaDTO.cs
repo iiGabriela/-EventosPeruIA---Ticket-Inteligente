@@ -11,6 +11,8 @@ public class EntradaDTO
     public int EventoId { get; set; }
     public string EventoNombre { get; set; } = string.Empty;
     public DateTime FechaInicio { get; set; }
+    /// <summary>Fin del evento: el frontend lo usa para saber si la entrada quedó sin ingreso.</summary>
+    public DateTime FechaFin { get; set; }
     public string Sede { get; set; } = string.Empty;
     public string Direccion { get; set; } = string.Empty;
     public decimal MontoPagado { get; set; }
