@@ -70,6 +70,20 @@ public class CompraRepository : ICompraRepository
         await _dbContext.Database.ExecuteSqlInterpolatedAsync(
             $"SELECT 1 FROM evento WHERE evento_id = {compra.EventoId} FOR UPDATE");
 
+        // Doble clic: si el mismo pedido (usuario + código de operación) llegó varias veces a la vez,
+        // las copias esperan el bloqueo de arriba y aquí encuentran la compra ya creada: se devuelve esa
+        // en lugar de intentar insertarla otra vez (que fallaría con un error 500).
+        var existente = await _dbContext.Compra
+                                        .AsNoTracking()
+                                        .Where(c => c.UsuarioId == compra.UsuarioId && c.CodigoOperacion == compra.CodigoOperacion)
+                                        .Select(c => (int?)c.CompraId)
+                                        .FirstOrDefaultAsync();
+        if (existente != null)
+        {
+            await transaccion.RollbackAsync();
+            return existente;
+        }
+
         var vendidas = await GetEntradasVendidas(compra.EventoId);
         if (vendidas + compra.Cantidad > aforoTotal)
         {
