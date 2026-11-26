@@ -64,6 +64,15 @@ public class NotificacionRepository : INotificacionRepository
             .ToListAsync();
     }
 
+    public async Task<List<int>> GetAdministradoresActivos()
+    {
+        return await _dbContext.Usuario
+            .AsNoTracking()
+            .Where(u => u.Estado == "ACTIVO" && u.Rol.Any(r => r.Nombre == "ADMINISTRADOR"))
+            .Select(u => u.UsuarioId)
+            .ToListAsync();
+    }
+
     public async Task CrearNotificaciones(IEnumerable<Notificacion> notificaciones)
     {
         var lista = notificaciones.ToList();

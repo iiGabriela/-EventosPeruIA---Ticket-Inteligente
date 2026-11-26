@@ -121,6 +121,26 @@ namespace EventosIAPeru.Core.Core.Services
             };
         }
 
+        /// <summary>Página principal: reseñas recientes con comentario. Solo se muestra el nombre de pila.</summary>
+        public async Task<List<ResenaDTO>> GetResenasRecientes(int cantidad)
+        {
+            var resenas = await _resenaRepository.GetResenasRecientes(Math.Clamp(cantidad, 1, 12));
+            return resenas.Select(r =>
+            {
+                var dto = Mapear(r);
+                dto.UsuarioNombre = NombreCorto(r.Usuario?.Nombre);
+                return dto;
+            }).ToList();
+        }
+
+        // "Lucía Ramos" -> "Lucía R." para no exponer el nombre completo en la portada
+        private static string NombreCorto(string? nombre)
+        {
+            var partes = (nombre ?? "").Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            if (partes.Length == 0) return "Asistente";
+            return partes.Length == 1 ? partes[0] : $"{partes[0]} {partes[1][0]}.";
+        }
+
         public async Task<IEnumerable<ResenaDTO>?> GetMisResenas(string emailUsuario)
         {
             var usuario = await _usuarioRepository.GetUsuarioByEmail(emailUsuario);

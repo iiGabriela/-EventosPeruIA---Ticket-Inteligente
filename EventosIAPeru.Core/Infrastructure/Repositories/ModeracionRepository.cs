@@ -70,6 +70,7 @@ namespace EventosIAPeru.Core.Infrastructure.Repositories
                             .Evento
                             .AsNoTracking()
                             .Include(e => e.Organizador)
+                            .Include(e => e.Categoria)
                             .Include(e => e.ReporteEvento)
                                 .ThenInclude(r => r.ReportadoPorUsuario)
                             .FirstOrDefaultAsync(e => e.EventoId == eventoId);

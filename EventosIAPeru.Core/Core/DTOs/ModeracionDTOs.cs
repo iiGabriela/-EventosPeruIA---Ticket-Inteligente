@@ -54,6 +54,18 @@ namespace EventosIAPeru.Core.Core.DTOs
         public bool? ValidacionMunicipal { get; set; }
         public int AforoTotal { get; set; }
         public int ReportesActivos { get; set; }
+        // Datos del evento para que el admin decida si lo aprueba
+        public string? Descripcion { get; set; }
+        public string? ImagenUrl { get; set; }
+        public string? CategoriaNombre { get; set; }
+        public DateTime FechaInicio { get; set; }
+        public DateTime FechaFin { get; set; }
+        public string? Sede { get; set; }
+        public string? Direccion { get; set; }
+        public string? Distrito { get; set; }
+        public string? Provincia { get; set; }
+        public string? Departamento { get; set; }
+        public decimal Precio { get; set; }
         public List<ReporteDTO> Reportes { get; set; } = new List<ReporteDTO>();
     }
 

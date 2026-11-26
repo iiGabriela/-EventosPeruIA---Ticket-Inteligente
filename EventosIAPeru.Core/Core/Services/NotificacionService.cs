@@ -154,6 +154,47 @@ public class NotificacionService : INotificacionService
         await _notificacionRepository.CrearNotificaciones(notificaciones);
     }
 
+    public async Task NotificarSolicitudAprobacion(Evento evento)
+    {
+        var admins = await _notificacionRepository.GetAdministradoresActivos();
+        var ahora = DateTime.UtcNow;
+        await _notificacionRepository.CrearNotificaciones(admins
+            .Where(id => id != evento.OrganizadorId)
+            .Select(id => new Notificacion
+            {
+                UsuarioId = id,
+                EventoId = evento.EventoId,
+                Titulo = "Evento por aprobar",
+                Mensaje = $"\"{evento.Nombre}\" espera tu revisión en Moderación → Eventos.",
+                Prioridad = PrioridadPrioritaria,
+                Leida = false,
+                FechaCreacion = ahora
+            }));
+    }
+
+    public async Task NotificarDecisionModeracion(Evento evento, string estadoModeracion, string? motivo)
+    {
+        var (titulo, mensaje) = estadoModeracion switch
+        {
+            "CONFORME" => ("Evento aprobado", $"Tu evento \"{evento.Nombre}\" fue aprobado y ya está publicado en la cartelera."),
+            "DESACTIVADO" => ("Evento rechazado", $"Tu evento \"{evento.Nombre}\" no fue aprobado. Motivo: {motivo}"),
+            _ => ("Evento en revisión", $"Tu evento \"{evento.Nombre}\" volvió a revisión y no está visible por ahora.")
+        };
+        await _notificacionRepository.CrearNotificaciones(new[]
+        {
+            new Notificacion
+            {
+                UsuarioId = evento.OrganizadorId,
+                EventoId = evento.EventoId,
+                Titulo = titulo,
+                Mensaje = mensaje,
+                Prioridad = estadoModeracion == "CONFORME" ? PrioridadInformativa : PrioridadPrioritaria,
+                Leida = false,
+                FechaCreacion = DateTime.UtcNow
+            }
+        });
+    }
+
     private static NotificacionDTO Mapear(Notificacion notificacion)
     {
         var prioritaria = string.Equals(notificacion.Prioridad, PrioridadPrioritaria, StringComparison.OrdinalIgnoreCase);

@@ -30,7 +30,7 @@ namespace EventosIAPeru.Core.Infrastructure.Repositories
                             .Include(e => e.Categoria)
                             .Include(e => e.Organizador)
                             .Where(e => e.Estado == "PUBLICADO"
-                                     && e.EstadoModeracion != "DESACTIVADO"
+                                     && e.EstadoModeracion == "CONFORME"   // aprobado por un administrador
                                      && e.FechaFin > ahora);
 
             if (!string.IsNullOrWhiteSpace(filtro.Texto))
@@ -161,6 +161,18 @@ namespace EventosIAPeru.Core.Infrastructure.Repositories
                 return rows > 0;
             }
             return false;
+        }
+
+        public async Task<bool> SolicitarAprobacion(int id)
+        {
+            var evento = await _dbContext.Evento.FirstOrDefaultAsync(e => e.EventoId == id);
+            if (evento == null) return false;
+
+            evento.Estado = "PUBLICADO";
+            evento.EstadoModeracion = "EN_REVISION";
+            evento.MotivoModeracion = null;
+            evento.FechaActualizacion = DateTime.UtcNow;
+            return await _dbContext.SaveChangesAsync() > 0;
         }
 
         public async Task<bool> UpdateEstado(int id, string estado)

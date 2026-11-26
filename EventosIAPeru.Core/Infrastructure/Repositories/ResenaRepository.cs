@@ -70,6 +70,19 @@ namespace EventosIAPeru.Core.Infrastructure.Repositories
             return (promedio, total);
         }
 
+        public async Task<List<ResenaEvento>> GetResenasRecientes(int cantidad)
+        {
+            return await _dbContext
+                            .ResenaEvento
+                            .AsNoTracking()
+                            .Include(r => r.Usuario)
+                            .Include(r => r.Evento)
+                            .Where(r => r.Comentario != null && r.Comentario != "")
+                            .OrderByDescending(r => r.FechaCreacion)
+                            .Take(cantidad)
+                            .ToListAsync();
+        }
+
         public async Task<List<ResenaEvento>> GetResenasDeEvento(int eventoId)
         {
             return await _dbContext

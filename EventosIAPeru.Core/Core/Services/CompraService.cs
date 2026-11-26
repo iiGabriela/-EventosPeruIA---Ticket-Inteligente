@@ -56,6 +56,9 @@ public class CompraService : ICompraService
         if (evento.EstadoModeracion == "DESACTIVADO")
             return ResultadoOperacion.Invalido("El evento fue desactivado por moderación.");
 
+        if (evento.EstadoModeracion != "CONFORME")
+            return ResultadoOperacion.Invalido("El evento todavía no fue aprobado por un administrador.");
+
         if (evento.FechaInicio <= DateTime.UtcNow)
             return ResultadoOperacion.Invalido("El evento ya comenzó.");
 

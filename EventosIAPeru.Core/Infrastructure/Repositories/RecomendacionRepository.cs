@@ -79,7 +79,7 @@ public class RecomendacionRepository : IRecomendacionRepository
         return _dbContext.Evento
             .AsNoTracking()
             .Where(e => e.Estado == "PUBLICADO"
-                     && e.EstadoModeracion != "DESACTIVADO"
+                     && e.EstadoModeracion == "CONFORME"
                      && e.FechaInicio > ahora
                      && e.FechaFin > ahora)
             .Select(e => new EventoRecomendacionProjection

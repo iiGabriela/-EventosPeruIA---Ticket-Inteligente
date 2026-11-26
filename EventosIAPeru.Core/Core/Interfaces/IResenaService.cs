@@ -11,6 +11,7 @@ namespace EventosIAPeru.Core.Core.Interfaces
 
         // Promedio y reseñas publicadas de un evento (null si el evento no existe)
         Task<ResumenResenasDTO?> GetResenasDeEvento(int eventoId);
+        Task<List<ResenaDTO>> GetResenasRecientes(int cantidad);
 
         // Historial: reseñas que escribió el usuario (null si el usuario no está registrado)
         Task<IEnumerable<ResenaDTO>?> GetMisResenas(string emailUsuario);
