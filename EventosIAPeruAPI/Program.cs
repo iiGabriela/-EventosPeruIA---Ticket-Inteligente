@@ -59,6 +59,8 @@ builder.Services.AddScoped<IModeracionService, ModeracionService>();
 // US-15: reglas automáticas (simples y de IA) al publicar o editar un evento
 builder.Services.AddScoped<IModeracionAutomatica, ModeracionAutomaticaService>();
 builder.Services.AddScoped<IEvaluadorReglasIA, EvaluadorReglasIA>();
+// US-13: filtro de reseñas maliciosas con IA
+builder.Services.AddScoped<IModeradorResenasIA, ModeradorResenasIA>();
 
 // Categorías y Eventos (US-04, US-05)
 builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();

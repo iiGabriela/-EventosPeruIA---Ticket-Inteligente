@@ -191,6 +191,21 @@ namespace EventosIAPeru.Core.Infrastructure.Repositories
             return await _dbContext.ReglaModeracion.FirstOrDefaultAsync(r => r.ReglaId == reglaId);
         }
 
+        public async Task AsegurarReglaSistema(string nombre, string criterio)
+        {
+            if (await _dbContext.ReglaModeracion.AnyAsync(r => r.Nombre == nombre && r.CreadaPorUsuarioId == null))
+                return;
+
+            // Se guarda aparte para no mezclarse con los cambios del evento que se está evaluando
+            var regla = new ReglaModeracion
+            {
+                Nombre = nombre, Tipo = "IA", Criterio = criterio, Accion = "EN_REVISION", Activa = true, CreadaPorUsuarioId = null
+            };
+            _dbContext.ReglaModeracion.Add(regla);
+            try { await _dbContext.SaveChangesAsync(); }
+            catch (DbUpdateException) { _dbContext.Entry(regla).State = EntityState.Detached; }
+        }
+
         public void AgregarRegla(ReglaModeracion regla)
         {
             _dbContext.ReglaModeracion.Add(regla);
