@@ -49,6 +49,10 @@ public class EntradaService : IEntradaService
         if (entrada.Estado != "VALIDA" || entrada.CheckIn != null)
             return (ResultadoOperacion.Invalido("Esta entrada ya fue utilizada o anulada."), null);
 
+        // Un evento que ya terminó no admite ingresos: no tiene sentido mostrar su QR
+        if (entrada.Compra.Evento != null && entrada.Compra.Evento.FechaFin <= DateTime.UtcNow)
+            return (ResultadoOperacion.Invalido("El evento ya terminó; esta entrada no registró ingreso."), null);
+
         var (token, expiraEn) = _qrService.GenerarToken(entrada.CodigoQr);
         var qr = new QrDinamicoDTO
         {
@@ -157,6 +161,7 @@ public class EntradaService : IEntradaService
             EventoId = e.Compra.EventoId,
             EventoNombre = e.Compra.Evento?.Nombre ?? string.Empty,
             FechaInicio = e.Compra.Evento?.FechaInicio ?? default,
+            FechaFin = e.Compra.Evento?.FechaFin ?? default,
             Sede = e.Compra.Evento?.Sede ?? string.Empty,
             Direccion = e.Compra.Evento?.Direccion ?? string.Empty,
             MontoPagado = e.Compra.PrecioUnitario,

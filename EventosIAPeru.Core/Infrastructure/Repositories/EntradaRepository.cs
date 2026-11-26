@@ -27,6 +27,7 @@ public class EntradaRepository : IEntradaRepository
         return await _dbContext.Entrada
                                .AsNoTracking()
                                .Include(e => e.Compra)
+                                   .ThenInclude(c => c.Evento)
                                .Include(e => e.CheckIn)
                                .FirstOrDefaultAsync(e => e.EntradaId == entradaId);
     }
