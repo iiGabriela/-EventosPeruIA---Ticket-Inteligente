@@ -2,6 +2,7 @@ using EventosIAPeru.Core.Core.DTOs;
 using EventosIAPeru.Core.Core.Entities;
 using EventosIAPeru.Core.Core.Interfaces;
 using EventosIAPeru.Core.Shared;
+using System.Text.RegularExpressions;
 
 namespace EventosIAPeru.Core.Core.Services
 {
@@ -15,10 +16,26 @@ namespace EventosIAPeru.Core.Core.Services
         private readonly IResenaRepository _resenaRepository;
         private readonly IUsuarioRepository _usuarioRepository;
 
-        public ResenaService(IResenaRepository resenaRepository, IUsuarioRepository usuarioRepository)
+        private readonly IModeradorResenasIA? _moderadorIA;
+
+        public ResenaService(IResenaRepository resenaRepository, IUsuarioRepository usuarioRepository, IModeradorResenasIA? moderadorIA = null)
         {
             _resenaRepository = resenaRepository;
             _usuarioRepository = usuarioRepository;
+            _moderadorIA = moderadorIA;
+        }
+
+        // Filtro rápido sin IA: enlaces, correos y teléfonos no tienen lugar en una reseña
+        private static readonly Regex Enlace = new(@"(https?://|www\.|\b[\w-]+\.(com|net|org|pe|io|ly|me|xyz)\b)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private static readonly Regex Correo = new(@"[\w.+-]+@[\w-]+\.[\w.]+", RegexOptions.Compiled);
+        private static readonly Regex Telefono = new(@"(\+?51[\s-]?)?\b9\d{2}[\s-]?\d{3}[\s-]?\d{3}\b", RegexOptions.Compiled);
+
+        /// <summary>US-13: motivo por el que un comentario no se publica sin consultar a la IA, o null si pasa.</summary>
+        public static string? MotivoBloqueoLocal(string comentario)
+        {
+            if (Enlace.IsMatch(comentario)) return "no se permiten enlaces ni publicidad en las reseñas";
+            if (Correo.IsMatch(comentario) || Telefono.IsMatch(comentario)) return "no compartas datos personales como correos o teléfonos";
+            return null;
         }
 
         public async Task<ResultadoOperacion> CrearResena(string emailUsuario, CrearResenaDTO dto)
@@ -48,6 +65,29 @@ namespace EventosIAPeru.Core.Core.Services
 
             // Si el comentario viene vacío, lo guardamos como null
             var comentario = dto.Comentario?.Trim();
+
+            // Filtro de reseñas maliciosas: primero reglas rápidas y luego la IA.
+            // Una crítica negativa honesta sí se publica; se bloquean insultos, odio, spam, etc.
+            if (!string.IsNullOrWhiteSpace(comentario))
+            {
+                var motivoLocal = MotivoBloqueoLocal(comentario);
+                if (motivoLocal != null)
+                    return ResultadoOperacion.Invalido("Tu reseña no se publicó: " + motivoLocal + ". Puedes corregirla y enviarla otra vez.");
+
+                if (_moderadorIA is { Disponible: true })
+                {
+                    try
+                    {
+                        var (bloquear, motivo) = await _moderadorIA.Evaluar(comentario, evento.Nombre);
+                        if (bloquear)
+                            return ResultadoOperacion.Invalido("Tu reseña no se publicó: " + motivo + " Puedes corregirla y enviarla otra vez.");
+                    }
+                    catch (Exception)
+                    {
+                        // Si la IA no responde, la reseña no se bloquea: ya pasó el filtro rápido
+                    }
+                }
+            }
 
             var resena = new ResenaEvento
             {

@@ -22,8 +22,19 @@ namespace EventosIAPeru.Core.Core.Services
             _evaluadorIA = evaluadorIA;
         }
 
+        /// <summary>Regla de IA del sistema que revisa todo evento en busca de contenido malicioso.</summary>
+        public const string NombreFiltroSeguridad = "Filtro de seguridad (IA)";
+        public const string CriterioFiltroSeguridad =
+            "El evento es malicioso o peligroso: parece una estafa o fraude (precios irreales, pide pagos, datos bancarios, " +
+            "contraseñas o contacto fuera de la plataforma, enlaces sospechosos), promueve actividades ilegales (drogas, armas, " +
+            "venta de alcohol a menores, apuestas ilegales), contiene discurso de odio, violencia, acoso o contenido sexual explícito. " +
+            "No lo marques solo por ser nocturno, ofrecer alcohol a adultos o tener precios altos.";
+
         public async Task<int> EvaluarEvento(int eventoId)
         {
+            // La regla de seguridad se crea sola la primera vez; el admin puede desactivarla en Reglas
+            await _moderacionRepository.AsegurarReglaSistema(NombreFiltroSeguridad, CriterioFiltroSeguridad);
+
             var reglas = (await _moderacionRepository.GetReglas()).Where(r => r.Activa).ToList();
             if (reglas.Count == 0) return 0;
 

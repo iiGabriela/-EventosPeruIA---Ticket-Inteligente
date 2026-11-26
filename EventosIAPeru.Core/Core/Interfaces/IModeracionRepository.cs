@@ -34,6 +34,8 @@ namespace EventosIAPeru.Core.Core.Interfaces
 
         // ---------- Reglas ----------
         Task<List<ReglaModeracion>> GetReglas();
+        /// <summary>Crea la regla de IA del sistema (sin autor) si todavía no existe.</summary>
+        Task AsegurarReglaSistema(string nombre, string criterio);
         Task<ReglaModeracion?> GetReglaParaEditar(int reglaId);
         void AgregarRegla(ReglaModeracion regla);
 
